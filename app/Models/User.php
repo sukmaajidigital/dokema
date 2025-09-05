@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -44,5 +45,16 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    // Relasi ke profil peserta
+    public function profilPeserta()
+    {
+        return $this->hasOne(ProfilPeserta::class);
+    }
+
+    // Relasi ke data magang sebagai pembimbing
+    public function magangDibimbing()
+    {
+        return $this->hasMany(DataMagang::class, 'pembimbing_id');
     }
 }
