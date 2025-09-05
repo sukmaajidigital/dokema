@@ -3,9 +3,18 @@
             Edit Profil Peserta
         </x-slot>
         <div class="max-w-xl mx-auto mt-10 p-6 bg-white rounded shadow">
-            <form action="{{ route('profil.update') }}" method="POST">
+            <form action="{{ route('profil.update', ['id' => $profil->id]) }}" method="POST">
                 @csrf
                 @method('PUT')
+                <div class="mb-4">
+                    <x-input-label for="user_id" value="User" />
+                    <select name="user_id" id="user_id" class="w-full border rounded px-3 py-2" required>
+                        <option value="">-- Pilih User --</option>
+                        @foreach ($users as $user)
+                            <option value="{{ $user->id }}" {{ $profil->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }} ({{ $user->email }})</option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="mb-4">
                     <x-input-label for="nim" value="NIM" />
                     <x-text-input type="text" name="nim" id="nim" value="{{ $profil->nim }}" class="w-full" required />

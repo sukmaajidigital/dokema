@@ -11,39 +11,42 @@ class ProfilPesertaController extends Controller
 {
     public function index()
     {
-        $profil = ProfilPeserta::where('user_id', Auth::id())->first();
-        return view('magang.profil.index', compact('profil'));
+        $profils = ProfilPeserta::with('user')->get();
+        return view('magang.profil.index', compact('profils'));
     }
 
     public function create()
     {
-        return view('magang.profil.create');
+        $users = \App\Models\User::where('role', 'magang')->get();
+        return view('magang.profil.create', compact('users'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
+            'user_id' => 'required|exists:users,id',
             'nim' => 'required|unique:profil_peserta',
             'universitas' => 'required',
             'jurusan' => 'required',
             'no_telepon' => 'required',
             'alamat' => 'nullable',
         ]);
-        $data['user_id'] = Auth::id();
         ProfilPeserta::create($data);
         return redirect()->route('profil.index')->with('success', 'Profil berhasil dibuat');
     }
 
-    public function edit()
+    public function edit($id)
     {
-        $profil = ProfilPeserta::where('user_id', Auth::id())->firstOrFail();
-        return view('magang.profil.edit', compact('profil'));
+        $profil = ProfilPeserta::findOrFail($id);
+        $users = \App\Models\User::where('role', 'magang')->get();
+        return view('magang.profil.edit', compact('profil', 'users'));
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
-        $profil = ProfilPeserta::where('user_id', Auth::id())->firstOrFail();
+        $profil = ProfilPeserta::findOrFail($id);
         $data = $request->validate([
+            'user_id' => 'required|exists:users,id',
             'nim' => 'required|unique:profil_peserta,nim,' . $profil->id,
             'universitas' => 'required',
             'jurusan' => 'required',
@@ -54,9 +57,10 @@ class ProfilPesertaController extends Controller
         return redirect()->route('profil.index')->with('success', 'Profil berhasil diupdate');
     }
 
-    public function destroy()
+    // ...existing code...
+    public function destroy($id)
     {
-        $profil = ProfilPeserta::where('user_id', Auth::id())->firstOrFail();
+        $profil = ProfilPeserta::findOrFail($id);
         $profil->delete();
         return redirect()->route('profil.index')->with('success', 'Profil berhasil dihapus');
     }

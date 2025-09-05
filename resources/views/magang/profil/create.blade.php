@@ -6,6 +6,15 @@
             <form action="{{ route('profil.store') }}" method="POST">
                 @csrf
                 <div class="mb-4">
+                    <x-input-label for="user_id" value="User" />
+                    <select name="user_id" id="user_id" class="w-full border rounded px-3 py-2" required>
+                        <option value="">-- Pilih User --</option>
+                        @foreach ($users as $user)
+                            <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="mb-4">
                     <x-input-label for="nim" value="NIM" />
                     <x-text-input type="text" name="nim" id="nim" class="w-full" required />
                 </div>

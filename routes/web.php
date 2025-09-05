@@ -24,9 +24,9 @@ Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('user.de
 Route::get('/profil', [ProfilPesertaController::class, 'index'])->name('profil.index');
 Route::get('/profil/create', [ProfilPesertaController::class, 'create'])->name('profil.create');
 Route::post('/profil', [ProfilPesertaController::class, 'store'])->name('profil.store');
-Route::get('/profil/edit', [ProfilPesertaController::class, 'edit'])->name('profil.edit');
-Route::put('/profil', [ProfilPesertaController::class, 'update'])->name('profil.update');
-Route::delete('/profil', [ProfilPesertaController::class, 'destroy'])->name('profil.destroy');
+Route::get('/profil/{id}/edit', [ProfilPesertaController::class, 'edit'])->name('profil.edit');
+Route::put('/profil/{id}', [ProfilPesertaController::class, 'update'])->name('profil.update');
+Route::delete('/profil/{id}', [ProfilPesertaController::class, 'destroy'])->name('profil.destroy');
 
 // Data Magang
 Route::get('/magang', [DataMagangController::class, 'index'])->name('magang.index');
