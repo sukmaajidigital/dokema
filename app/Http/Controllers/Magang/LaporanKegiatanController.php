@@ -10,19 +10,19 @@ use Illuminate\Support\Facades\Auth;
 
 class LaporanKegiatanController extends Controller
 {
-    public function index($magangId)
+    public function index()
     {
-        $laporan = LaporanKegiatan::where('data_magang_id', $magangId)->get();
-        return view('magang.laporan.index', compact('laporan', 'magangId'));
+        $laporan = LaporanKegiatan::all();
+        return view('magang.laporan.index', compact('laporan'));
     }
 
-    public function create($magangId)
+    public function create()
     {
         $dataMagangList = DataMagang::all();
-        return view('magang.laporan.create', compact('magangId', 'dataMagangList'));
+        return view('magang.laporan.create', compact('dataMagangList'));
     }
 
-    public function store(Request $request, $magangId)
+    public function store(Request $request)
     {
         $data = $request->validate([
             'data_magang_id' => 'required|exists:data_magang,id',
@@ -46,11 +46,11 @@ class LaporanKegiatanController extends Controller
         return redirect()->route('laporan.index', [$data['data_magang_id']])->with('success', 'Laporan berhasil dibuat');
     }
 
-    public function edit($magangId, $id)
+    public function edit($id)
     {
         $laporan = LaporanKegiatan::findOrFail($id);
         $dataMagangList = DataMagang::all();
-        return view('magang.laporan.edit', compact('laporan', 'magangId', 'dataMagangList'));
+        return view('magang.laporan.edit', compact('laporan', 'dataMagangList'));
     }
 
     public function update(Request $request, $magangId, $id)
@@ -76,10 +76,10 @@ class LaporanKegiatanController extends Controller
         return redirect()->route('laporan.index', [$data['data_magang_id']])->with('success', 'Laporan berhasil diupdate');
     }
 
-    public function destroy($magangId, $id)
+    public function destroy($id)
     {
         $laporan = LaporanKegiatan::findOrFail($id);
         $laporan->delete();
-        return redirect()->route('laporan.index', $magangId)->with('success', 'Laporan berhasil dihapus');
+        return redirect()->route('laporan.index')->with('success', 'Laporan berhasil dihapus');
     }
 }

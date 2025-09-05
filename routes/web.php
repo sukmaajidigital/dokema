@@ -37,12 +37,12 @@ Route::put('/magang/{id}', [DataMagangController::class, 'update'])->name('magan
 Route::delete('/magang/{id}', [DataMagangController::class, 'destroy'])->name('magang.destroy');
 
 // Laporan Kegiatan
-Route::get('/magang/{magangId}/laporan', [LaporanKegiatanController::class, 'index'])->name('laporan.index');
-Route::get('/magang/{magangId}/laporan/create', [LaporanKegiatanController::class, 'create'])->name('laporan.create');
-Route::post('/magang/{magangId}/laporan', [LaporanKegiatanController::class, 'store'])->name('laporan.store');
-Route::get('/magang/{magangId}/laporan/{id}/edit', [LaporanKegiatanController::class, 'edit'])->name('laporan.edit');
-Route::put('/magang/{magangId}/laporan/{id}', [LaporanKegiatanController::class, 'update'])->name('laporan.update');
-Route::delete('/magang/{magangId}/laporan/{id}', [LaporanKegiatanController::class, 'destroy'])->name('laporan.destroy');
+Route::get('/magang/laporan', [LaporanKegiatanController::class, 'index'])->name('laporan.index');
+Route::get('/magang/laporan/create', [LaporanKegiatanController::class, 'create'])->name('laporan.create');
+Route::post('/magang/laporan', [LaporanKegiatanController::class, 'store'])->name('laporan.store');
+Route::get('/magang/laporan/{id}/edit', [LaporanKegiatanController::class, 'edit'])->name('laporan.edit');
+Route::put('/magang/laporan/{id}', [LaporanKegiatanController::class, 'update'])->name('laporan.update');
+Route::delete('/magang/laporan/{id}', [LaporanKegiatanController::class, 'destroy'])->name('laporan.destroy');
 
 // Log Bimbingan
 Route::get('/magang/{magangId}/bimbingan', [LogBimbinganController::class, 'index'])->name('bimbingan.index');

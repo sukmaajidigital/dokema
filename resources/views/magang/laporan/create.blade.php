@@ -35,7 +35,7 @@
                 }
             }
         </script>
-        <form action="{{ route('laporan.store', $magangId) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('laporan.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-4">
                 <label for="data_magang_id" class="block font-semibold mb-2">Pilih Data Magang</label>
@@ -76,7 +76,7 @@
             </div>
             <div class="flex gap-2 mt-4">
                 <x-admin.form-button>Simpan</x-admin.form-button>
-                <a href="{{ route('laporan.index', $magangId) }}" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Cancel</a>
+                <a href="{{ route('laporan.index') }}" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Cancel</a>
             </div>
         </form>
     </div>
