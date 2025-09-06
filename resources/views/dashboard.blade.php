@@ -73,7 +73,7 @@
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Status Magang</h3>
                 <div class="space-y-3">
                     @php
-                        $colors = ['aktif' => 'green', 'selesai' => 'blue', 'pending' => 'yellow', 'dibatalkan' => 'red'];
+                        $colors = ['diterima' => 'green', 'menunggu' => 'yellow', 'ditolak' => 'red'];
                         $totalStatus = array_sum($statusMagang);
                     @endphp
                     @foreach ($statusMagang as $status => $count)

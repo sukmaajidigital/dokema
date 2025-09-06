@@ -17,7 +17,7 @@ class DashboardController extends Controller
         // Statistik Dashboard
         $totalPeserta = ProfilPeserta::count();
         $totalMagang = DataMagang::count();
-        $magangAktif = DataMagang::where('status', 'aktif')->count();
+        $magangAktif = DataMagang::where('status', 'diterima')->count();
         $totalLaporan = LaporanKegiatan::count();
         $totalBimbingan = LogBimbingan::count();
         $totalUser = User::count();
@@ -25,6 +25,7 @@ class DashboardController extends Controller
         // Magang yang akan berakhir dalam 30 hari
         $magangAkanBerakhir = DataMagang::where('tanggal_selesai', '<=', now()->addDays(30))
             ->where('tanggal_selesai', '>=', now())
+            ->where('status', 'diterima')
             ->with('profilPeserta')
             ->latest()
             ->take(5)
