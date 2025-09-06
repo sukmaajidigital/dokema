@@ -1,11 +1,26 @@
 {
     "$schema": "https://json.schemastore.org/package.json",
+    "name": "dokema",
+    "version": "1.0.0",
+    "description": "DOKEMA - Sistem Manajemen Magang Terintegrasi",
     "private": true,
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "watch": "vite build --watch",
+        "hot": "vite --host"
     },
+    "keywords": [
+        "laravel",
+        "internship",
+        "management",
+        "dokema",
+        "tailwindcss",
+        "alpinejs"
+    ],
+    "author": "Sukma Aji Digital <support@sukmaajidigital.com>",
+    "license": "MIT",
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",
         "axios": "^1.11.0",

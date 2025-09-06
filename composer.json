@@ -1,13 +1,24 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "sukmaajidigital/dokema",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "DOKEMA - Sistem Manajemen Magang Terintegrasi dengan Workflow Approval",
     "keywords": [
         "laravel",
-        "framework"
+        "internship",
+        "management",
+        "workflow",
+        "approval",
+        "dokema",
+        "magang"
     ],
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Sukma Aji Digital",
+            "email": "support@sukmaajidigital.com"
+        }
+    ],
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",
