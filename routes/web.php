@@ -9,9 +9,14 @@ use App\Http\Controllers\Magang\LogBimbinganController;
 use App\Http\Controllers\Magang\PenilaianAkhirController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Magang\WorkflowMagangController;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+
+// Workflow Management (untuk HR)
+Route::get('/workflow/approval', [WorkflowMagangController::class, 'index'])->name('workflow.approval');
+Route::post('/workflow/process/{magangId}', [WorkflowMagangController::class, 'processApplication'])->name('workflow.process');
 // User Management
 Route::get('/user', [UserController::class, 'index'])->name('user.index');
 Route::get('/user/create', [UserController::class, 'create'])->name('user.create');

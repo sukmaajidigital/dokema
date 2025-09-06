@@ -18,6 +18,7 @@ class DashboardController extends Controller
         $totalPeserta = ProfilPeserta::count();
         $totalMagang = DataMagang::count();
         $magangAktif = DataMagang::where('status', 'diterima')->count();
+        $magangMenunggu = DataMagang::where('status', 'menunggu')->count();
         $totalLaporan = LaporanKegiatan::count();
         $totalBimbingan = LogBimbingan::count();
         $totalUser = User::count();
@@ -53,6 +54,7 @@ class DashboardController extends Controller
             'totalPeserta',
             'totalMagang',
             'magangAktif',
+            'magangMenunggu',
             'totalLaporan',
             'totalBimbingan',
             'totalUser',

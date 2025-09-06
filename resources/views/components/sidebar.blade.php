@@ -19,6 +19,14 @@
             </a>
         </div>
         <div>
+            <a href="{{ route('workflow.approval') }}" class="px-3 py-2 flex items-center rounded-sm {{ request()->routeIs('workflow.*') ? $activeClasses : $inactiveClasses }}">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                </svg>
+                <span class="mx-3">Approval Workflow</span>
+            </a>
+        </div>
+        <div>
             <a href="{{ route('user.index') }}" class="px-3 py-2 flex items-center rounded-sm {{ request()->routeIs('user.*') ? $activeClasses : $inactiveClasses }}">
                 <x-lucide-users class="h-5 w-5" />
                 <span class="mx-3">User</span>
