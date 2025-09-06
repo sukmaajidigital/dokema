@@ -8,10 +8,10 @@ use App\Http\Controllers\Magang\LaporanKegiatanController;
 use App\Http\Controllers\Magang\LogBimbinganController;
 use App\Http\Controllers\Magang\PenilaianAkhirController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DashboardController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 // User Management
 Route::get('/user', [UserController::class, 'index'])->name('user.index');
 Route::get('/user/create', [UserController::class, 'create'])->name('user.create');
