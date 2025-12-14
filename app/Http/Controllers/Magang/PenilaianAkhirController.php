@@ -6,6 +6,7 @@ use App\Models\PenilaianAkhir;
 use App\Models\DataMagang;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class PenilaianAkhirController extends Controller
 {
@@ -35,7 +36,7 @@ class PenilaianAkhirController extends Controller
         }
 
         // Only pembimbing can create penilaian
-        if (auth()->user()->role !== 'pembimbing' || $dataMagang->pembimbing_id !== auth()->id()) {
+        if (Auth::user()->role !== 'pembimbing' || $dataMagang->pembimbing_id !== Auth::id()) {
             return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk menilai magang ini');
         }
 

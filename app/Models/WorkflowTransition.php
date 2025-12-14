@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class WorkflowTransition extends Model
 {
@@ -38,7 +39,7 @@ class WorkflowTransition extends Model
             'data_magang_id' => $magang->id,
             'from_status' => $magang->getOriginal('workflow_status'),
             'to_status' => $magang->workflow_status,
-            'triggered_by' => auth()->id(),
+            'triggered_by' => Auth::id(),
             'notes' => $notes,
             'metadata' => $metadata,
         ]);

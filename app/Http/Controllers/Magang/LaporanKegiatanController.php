@@ -88,18 +88,18 @@ class LaporanKegiatanController extends Controller
         $laporan = LaporanKegiatan::findOrFail($id);
 
         // Only pembimbing can approve
-        if (auth()->user()->role !== 'pembimbing') {
+        if (Auth::user()->role !== 'pembimbing') {
             return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk menyetujui laporan');
         }
 
         // Check if pembimbing is assigned to this intern
-        if ($laporan->dataMagang->pembimbing_id !== auth()->id()) {
+        if ($laporan->dataMagang->pembimbing_id !== Auth::id()) {
             return redirect()->back()->with('error', 'Anda bukan pembimbing untuk magang ini');
         }
 
         $laporan->update([
             'status_verifikasi' => 'verified',
-            'verified_by' => auth()->id(),
+            'verified_by' => Auth::id(),
             'verified_at' => now(),
         ]);
 
@@ -111,12 +111,12 @@ class LaporanKegiatanController extends Controller
         $laporan = LaporanKegiatan::findOrFail($id);
 
         // Only pembimbing can reject
-        if (auth()->user()->role !== 'pembimbing') {
+        if (Auth::user()->role !== 'pembimbing') {
             return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk menolak laporan');
         }
 
         // Check if pembimbing is assigned to this intern
-        if ($laporan->dataMagang->pembimbing_id !== auth()->id()) {
+        if ($laporan->dataMagang->pembimbing_id !== Auth::id()) {
             return redirect()->back()->with('error', 'Anda bukan pembimbing untuk magang ini');
         }
 
@@ -126,7 +126,7 @@ class LaporanKegiatanController extends Controller
 
         $laporan->update([
             'status_verifikasi' => 'rejected',
-            'verified_by' => auth()->id(),
+            'verified_by' => Auth::id(),
             'verified_at' => now(),
             'catatan_verifikasi' => $request->catatan_verifikasi,
         ]);
