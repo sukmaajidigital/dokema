@@ -8,7 +8,7 @@
     <meta name="description" content="Sistem Manajemen Magang - Dokema">
     <meta name="author" content="Dokema Team">
     <title>{{ isset($title) ? $title . ' - ' : '' }}Dokema - Sistem Manajemen Magang</title>
-    <link rel="icon" type="image/png" href="{{ asset('logo/logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('logo/telkom_logo.png') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])

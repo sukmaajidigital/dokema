@@ -1,7 +1,7 @@
 # DOKEMA - Sistem Manajemen Magang
 
 <p align="center">
-    <img src="public/logo/logo.png" width="100" alt="Dokema Logo">
+    <img src="public/logo/telkom_logo.png" width="100" alt="Dokema Logo">
 </p>
 
 <p align="center">

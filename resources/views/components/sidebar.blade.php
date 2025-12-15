@@ -55,7 +55,7 @@
 
     <!-- Logo/Brand -->
     <div class="flex items-center justify-start h-16 px-6 bg-blue-800 border-b border-blue-700">
-        <img src="{{ asset('logo/logo.png') }}" alt="Dokema Logo" class="h-8 w-8 mr-3">
+        <img src="{{ asset('logo/telkom_logo.png') }}" alt="Dokema Logo" class="h-8 w-8 mr-3">
         <span class="text-xl font-semibold text-white">Dokema</span>
     </div>
 
