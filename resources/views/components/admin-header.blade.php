@@ -4,8 +4,8 @@
         <div class="flex items-center justify-between h-16">
             <!-- Logo and Title for Desktop -->
             <div class="hidden lg:flex items-center space-x-4">
-                <img src="{{ asset('logo/telkom_logo.png') }}" alt="Dokema Logo" class="h-8 w-8">
-                <h1 class="text-xl font-semibold text-gray-900">Dokema</h1>
+                {{-- <img src="{{ asset('logo/telkom_logo.png') }}" alt="Dokema Logo" class="h-8 w-8">
+                <h1 class="text-xl font-semibold text-gray-900">Dokema</h1> --}}
             </div>
 
             <!-- Mobile menu button -->

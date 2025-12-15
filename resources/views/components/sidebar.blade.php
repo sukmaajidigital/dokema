@@ -54,9 +54,9 @@
 <aside class="fixed inset-y-0 left-0 z-50 w-64 bg-blue-900 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0" :class="{ 'translate-x-0 ease-out': sidebarOpen, '-translate-x-full ease-in': !sidebarOpen }">
 
     <!-- Logo/Brand -->
-    <div class="flex items-center justify-start h-16 px-6 bg-blue-800 border-b border-blue-700">
-        <img src="{{ asset('logo/telkom_logo.png') }}" alt="Dokema Logo" class="h-8 w-8 mr-3">
-        <span class="text-xl font-semibold text-white">Dokema</span>
+    <div class="flex items-center justify-start h-16 px-6 bg-white border-b border-white">
+        <img src="{{ asset('logo/telkom_logo.png') }}" alt="Dokema Logo" class="h-10 w-auto mr-3 object-contain">
+        <span class="text-xl font-semibold text-red-500">Dokema</span>
     </div>
 
     <!-- Navigation -->
