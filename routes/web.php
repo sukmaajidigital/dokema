@@ -20,14 +20,19 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 
+// Waiting for Approval Page (accessible without full auth)
+Route::get('/waiting-approval', [AuthController::class, 'showWaitingApproval'])->name('waiting-approval');
+
 // Protected Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
-    // Workflow Management (untuk HR)
-    Route::get('/workflow/approval', [WorkflowMagangController::class, 'index'])->name('workflow.approval');
-    Route::post('/workflow/process/{magangId}', [WorkflowMagangController::class, 'processApplication'])->name('workflow.process');
+    // Workflow Management (STRICT: HR ONLY) - Issue #2
+    Route::middleware(['role:hr'])->group(function () {
+        Route::get('/workflow/approval', [WorkflowMagangController::class, 'index'])->name('workflow.approval');
+        Route::post('/workflow/process/{magangId}', [WorkflowMagangController::class, 'processApplication'])->name('workflow.process');
+    });
 
     // Settings Management (untuk HR)
     Route::middleware(['role:hr'])->group(function () {
@@ -63,13 +68,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/magang/laporan', [LaporanKegiatanController::class, 'index'])->name('laporan.index');
     Route::get('/magang/laporan/create', [LaporanKegiatanController::class, 'create'])->name('laporan.create');
     Route::post('/magang/laporan', [LaporanKegiatanController::class, 'store'])->name('laporan.store');
-    Route::get('/magang/laporan/{id}/edit', [LaporanKegiatanController::class, 'edit'])->name('laporan.edit');
-    Route::put('/magang/laporan/{id}', [LaporanKegiatanController::class, 'update'])->name('laporan.update');
-    Route::delete('/magang/laporan/{id}', [LaporanKegiatanController::class, 'destroy'])->name('laporan.destroy');
+    Route::middleware(['ownership'])->group(function () {
+        Route::get('/magang/laporan/{id}/edit', [LaporanKegiatanController::class, 'edit'])->name('laporan.edit');
+        Route::put('/magang/laporan/{id}', [LaporanKegiatanController::class, 'update'])->name('laporan.update');
+        Route::delete('/magang/laporan/{id}', [LaporanKegiatanController::class, 'destroy'])->name('laporan.destroy');
+    });
 
-    // Report Approval Routes (Issue #6)
-    Route::post('/laporan/{id}/approve', [LaporanKegiatanController::class, 'approve'])->name('laporan.approve');
-    Route::post('/laporan/{id}/reject', [LaporanKegiatanController::class, 'reject'])->name('laporan.reject');
+    // Report Approval Routes (Issue #6) - PEMBIMBING ONLY
+    Route::middleware(['role:pembimbing'])->group(function () {
+        Route::post('/laporan/{id}/approve', [LaporanKegiatanController::class, 'approve'])->name('laporan.approve');
+        Route::post('/laporan/{id}/reject', [LaporanKegiatanController::class, 'reject'])->name('laporan.reject');
+    });
 
     // Log Bimbingan
     Route::get('/magang/{magangId}/bimbingan', [LogBimbinganController::class, 'index'])->name('bimbingan.index');
@@ -79,11 +88,15 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/magang/{magangId}/bimbingan/{id}', [LogBimbinganController::class, 'update'])->name('bimbingan.update');
     Route::delete('/magang/{magangId}/bimbingan/{id}', [LogBimbinganController::class, 'destroy'])->name('bimbingan.destroy');
 
-    // Penilaian Akhir
-    Route::get('/penilaian', [PenilaianAkhirController::class, 'index'])->name('penilaian.index');
-    Route::get('/magang/{magangId}/penilaian/create', [PenilaianAkhirController::class, 'create'])->name('penilaian.create');
-    Route::post('/magang/{magangId}/penilaian', [PenilaianAkhirController::class, 'store'])->name('penilaian.store');
-    Route::get('/magang/{magangId}/penilaian/{id}/edit', [PenilaianAkhirController::class, 'edit'])->name('penilaian.edit');
-    Route::put('/magang/{magangId}/penilaian/{id}', [PenilaianAkhirController::class, 'update'])->name('penilaian.update');
-    Route::delete('/magang/{magangId}/penilaian/{id}', [PenilaianAkhirController::class, 'destroy'])->name('penilaian.destroy');
+    // Penilaian Akhir (PEMBIMBING & HR ONLY) - Issue #8
+    Route::middleware(['role:pembimbing,hr'])->group(function () {
+        Route::get('/penilaian', [PenilaianAkhirController::class, 'index'])->name('penilaian.index');
+        Route::get('/magang/{magangId}/penilaian/create', [PenilaianAkhirController::class, 'create'])->name('penilaian.create');
+        Route::post('/magang/{magangId}/penilaian', [PenilaianAkhirController::class, 'store'])->name('penilaian.store');
+        Route::middleware(['ownership'])->group(function () {
+            Route::get('/magang/{magangId}/penilaian/{id}/edit', [PenilaianAkhirController::class, 'edit'])->name('penilaian.edit');
+            Route::put('/magang/{magangId}/penilaian/{id}', [PenilaianAkhirController::class, 'update'])->name('penilaian.update');
+            Route::delete('/magang/{magangId}/penilaian/{id}', [PenilaianAkhirController::class, 'destroy'])->name('penilaian.destroy');
+        });
+    });
 });

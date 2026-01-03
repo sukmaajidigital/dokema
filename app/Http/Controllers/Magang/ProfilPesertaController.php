@@ -11,7 +11,20 @@ class ProfilPesertaController extends Controller
 {
     public function index()
     {
-        $profils = ProfilPeserta::with('user')->get();
+        // Filter profil berdasarkan role (Issue #5)
+        if (Auth::user()->role === 'magang') {
+            // Peserta hanya bisa lihat profil sendiri
+            $profils = Auth::user()->profilPeserta ? collect([Auth::user()->profilPeserta]) : collect([]);
+        } elseif (Auth::user()->role === 'pembimbing') {
+            // Pembimbing hanya bisa lihat profil peserta yang dibimbing
+            $profils = ProfilPeserta::whereIn(
+                'id',
+                Auth::user()->magangDibimbing->pluck('profil_peserta_id')
+            )->with('user')->get();
+        } else {
+            // HR bisa lihat semua profil
+            $profils = ProfilPeserta::with('user')->get();
+        }
         return view('magang.profil.index', compact('profils'));
     }
 
