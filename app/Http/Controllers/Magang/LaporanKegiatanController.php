@@ -12,7 +12,25 @@ class LaporanKegiatanController extends Controller
 {
     public function index()
     {
-        $laporan = LaporanKegiatan::all();
+        // Filter laporan berdasarkan role pengguna (Issue #5)
+        if (Auth::user()->role === 'magang') {
+            // Peserta hanya bisa lihat laporan milik sendiri
+            $dataMagang = Auth::user()->profilPeserta->dataMagang;
+            if (!$dataMagang) {
+                return view('magang.laporan.index', ['laporan' => []]);
+            }
+            $laporan = $dataMagang->laporanKegiatan()->latest()->paginate(10);
+        } elseif (Auth::user()->role === 'pembimbing') {
+            // Pembimbing hanya bisa lihat laporan dari peserta yang dibimbing
+            $laporan = LaporanKegiatan::whereIn(
+                'data_magang_id',
+                Auth::user()->magangDibimbing->pluck('id')
+            )->latest()->paginate(10);
+        } else {
+            // HR bisa lihat semua laporan
+            $laporan = LaporanKegiatan::latest()->paginate(10);
+        }
+
         return view('magang.laporan.index', compact('laporan'));
     }
 

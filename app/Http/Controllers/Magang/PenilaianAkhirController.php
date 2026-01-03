@@ -12,10 +12,29 @@ class PenilaianAkhirController extends Controller
 {
     public function index()
     {
-        // Ambil semua penilaian dengan relasi ke data magang dan profil peserta
-        $penilaianList = PenilaianAkhir::with(['dataMagang.profilPeserta', 'dataMagang.pembimbing'])
-            ->latest()
-            ->paginate(10);
+        // Filter penilaian berdasarkan role pengguna (Issue #5)
+        if (Auth::user()->role === 'magang') {
+            // Peserta hanya bisa lihat penilaian milik sendiri
+            $dataMagang = Auth::user()->profilPeserta->dataMagang;
+            if (!$dataMagang || !$dataMagang->penilaianAkhir) {
+                return view('magang.penilaian.index', ['penilaianList' => []]);
+            }
+            $penilaianList = collect([$dataMagang->penilaianAkhir]);
+        } elseif (Auth::user()->role === 'pembimbing') {
+            // Pembimbing hanya bisa lihat penilaian peserta yang dibimbing
+            $penilaianList = PenilaianAkhir::whereIn(
+                'data_magang_id',
+                Auth::user()->magangDibimbing->pluck('id')
+            )
+                ->with(['dataMagang.profilPeserta', 'dataMagang.pembimbing'])
+                ->latest()
+                ->paginate(10);
+        } else {
+            // HR bisa lihat semua penilaian
+            $penilaianList = PenilaianAkhir::with(['dataMagang.profilPeserta', 'dataMagang.pembimbing'])
+                ->latest()
+                ->paginate(10);
+        }
 
         return view('magang.penilaian.index', compact('penilaianList'));
     }
