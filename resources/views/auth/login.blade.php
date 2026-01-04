@@ -73,6 +73,14 @@
                 </div>
             </form>
 
+            <!-- Register Button -->
+            <div class="text-center">
+                <p class="text-sm text-gray-600 mb-2">Belum punya akun?</p>
+                <a href="{{ route('register') }}" class="inline-flex justify-center py-1.5 px-4 border border-blue-600 text-sm font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Daftar Sekarang
+                </a>
+            </div>
+
 
         </div>
     </div>

@@ -12,7 +12,7 @@
 
 <body class="bg-gray-50">
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full space-y-8">
+        <div class="max-w-4xl w-full space-y-8">
             <div>
                 <img class="mx-auto h-24 w-auto" src="{{ asset('logo/telkom_logo.png') }}" alt="DOKEMA">
                 <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -44,35 +44,13 @@
                 @endif
 
                 <div class="rounded-md shadow-sm space-y-4">
-                    <!-- Name (Username) -->
+                    <!-- Nama Peserta -->
                     <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-                            Username <span class="text-red-600">*</span>
+                        <label for="nama_peserta" class="block text-sm font-medium text-gray-700 mb-1">
+                            Nama Lengkap Peserta <span class="text-red-600">*</span>
                         </label>
-                        <input id="name" name="name" type="text" required class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Username Anda" value="{{ old('name') }}" />
-                        @error('name')
-                            <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <!-- Email -->
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-                            Email <span class="text-red-600">*</span>
-                        </label>
-                        <input id="email" name="email" type="email" required class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="email@example.com" value="{{ old('email') }}" />
-                        @error('email')
-                            <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <!-- Nama Lengkap -->
-                    <div>
-                        <label for="nama_lengkap" class="block text-sm font-medium text-gray-700 mb-1">
-                            Nama Lengkap <span class="text-red-600">*</span>
-                        </label>
-                        <input id="nama_lengkap" name="nama_lengkap" type="text" required class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Nama lengkap Anda" value="{{ old('nama_lengkap') }}" />
-                        @error('nama_lengkap')
+                        <input id="nama_peserta" name="nama_peserta" type="text" required class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Nama lengkap sesuai identitas" value="{{ old('nama_peserta') }}" />
+                        @error('nama_peserta')
                             <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
                         @enderror
                     </div>
@@ -99,6 +77,17 @@
                         @enderror
                     </div>
 
+                    <!-- NIM -->
+                    <div>
+                        <label for="nim" class="block text-sm font-medium text-gray-700 mb-1">
+                            NIM / NISN <span class="text-red-600">*</span>
+                        </label>
+                        <input id="nim" name="nim" type="text" required class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Nomor Induk Mahasiswa atau NISN" value="{{ old('nim') }}" />
+                        @error('nim')
+                            <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+
                     <!-- No HP -->
                     <div>
                         <label for="no_hp" class="block text-sm font-medium text-gray-700 mb-1">
@@ -106,6 +95,28 @@
                         </label>
                         <input id="no_hp" name="no_hp" type="tel" required class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="+62812345678" value="{{ old('no_hp') }}" />
                         @error('no_hp')
+                            <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <!-- Name (Username) -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                            Username <span class="text-red-600">*</span>
+                        </label>
+                        <input id="name" name="name" type="text" required class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Username Anda" value="{{ old('name') }}" />
+                        @error('name')
+                            <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                            Email <span class="text-red-600">*</span>
+                        </label>
+                        <input id="email" name="email" type="email" required class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="email@example.com" value="{{ old('email') }}" />
+                        @error('email')
                             <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
                         @enderror
                     </div>

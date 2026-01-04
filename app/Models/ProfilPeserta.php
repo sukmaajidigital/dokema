@@ -13,6 +13,7 @@ class ProfilPeserta extends Model
 
     protected $fillable = [
         'user_id',
+        'nama_peserta',
         'nim',
         'universitas',
         'jurusan',

@@ -95,9 +95,10 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'nama_lengkap' => ['required', 'string', 'max:255'],
+            'nama_peserta' => ['required', 'string', 'max:255'],
             'universitas' => ['required', 'string', 'max:255'],
             'jurusan' => ['required', 'string', 'max:255'],
+            'nim' => ['required', 'string', 'max:50', 'unique:profil_peserta'],
             'no_hp' => ['required', 'string', 'max:15'],
         ]);
 
@@ -109,14 +110,14 @@ class AuthController extends Controller
             'role' => 'magang', // Default role for registration
         ]);
 
-        // Create profil_peserta
+        // Create profil_peserta - simpan NIM/NISN ke field nim
         $profilPeserta = \App\Models\ProfilPeserta::create([
             'user_id' => $user->id,
-            'nama' => $validated['nama_lengkap'],
-            'email' => $validated['email'],
+            'nama_peserta' => $validated['nama_peserta'],
+            'nim' => $validated['nim'],
             'universitas' => $validated['universitas'],
             'jurusan' => $validated['jurusan'],
-            'no_hp' => $validated['no_hp'],
+            'no_telepon' => $validated['no_hp'],
         ]);
 
         // Create data_magang with status 'submitted' for HRD review
