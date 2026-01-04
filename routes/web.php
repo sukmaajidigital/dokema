@@ -80,23 +80,27 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/laporan/{id}/reject', [LaporanKegiatanController::class, 'reject'])->name('laporan.reject');
     });
 
-    // Log Bimbingan
-    Route::get('/magang/{magangId}/bimbingan', [LogBimbinganController::class, 'index'])->name('bimbingan.index');
-    Route::get('/magang/{magangId}/bimbingan/create', [LogBimbinganController::class, 'create'])->name('bimbingan.create');
-    Route::post('/magang/{magangId}/bimbingan', [LogBimbinganController::class, 'store'])->name('bimbingan.store');
-    Route::get('/magang/{magangId}/bimbingan/{id}/edit', [LogBimbinganController::class, 'edit'])->name('bimbingan.edit');
-    Route::put('/magang/{magangId}/bimbingan/{id}', [LogBimbinganController::class, 'update'])->name('bimbingan.update');
-    Route::delete('/magang/{magangId}/bimbingan/{id}', [LogBimbinganController::class, 'destroy'])->name('bimbingan.destroy');
+    // Log Bimbingan - Flat routes (filter di controller berdasarkan role)
+    Route::get('/bimbingan', [LogBimbinganController::class, 'index'])->name('bimbingan.index');
+    Route::get('/bimbingan/create', [LogBimbinganController::class, 'create'])->name('bimbingan.create');
+    Route::post('/bimbingan', [LogBimbinganController::class, 'store'])->name('bimbingan.store');
+    Route::get('/bimbingan/{id}/edit', [LogBimbinganController::class, 'edit'])->name('bimbingan.edit');
+    Route::put('/bimbingan/{id}', [LogBimbinganController::class, 'update'])->name('bimbingan.update');
+    Route::delete('/bimbingan/{id}', [LogBimbinganController::class, 'destroy'])->name('bimbingan.destroy');
 
-    // Penilaian Akhir (PEMBIMBING & HR ONLY) - Issue #8
+    // Penilaian Akhir - Accessible by all roles (filter di controller)
+    // Magang: lihat penilaian sendiri (read-only)
+    // Pembimbing: lihat & buat penilaian untuk peserta yang dibimbing
+    // HR: lihat semua penilaian
+    Route::get('/penilaian', [PenilaianAkhirController::class, 'index'])->name('penilaian.index');
+    Route::get('/penilaian/{id}', [PenilaianAkhirController::class, 'show'])->name('penilaian.show');
+
+    // Create/Edit/Delete only for Pembimbing & HR
     Route::middleware(['role:pembimbing,hr'])->group(function () {
-        Route::get('/penilaian', [PenilaianAkhirController::class, 'index'])->name('penilaian.index');
-        Route::get('/magang/{magangId}/penilaian/create', [PenilaianAkhirController::class, 'create'])->name('penilaian.create');
-        Route::post('/magang/{magangId}/penilaian', [PenilaianAkhirController::class, 'store'])->name('penilaian.store');
-        Route::middleware(['ownership'])->group(function () {
-            Route::get('/magang/{magangId}/penilaian/{id}/edit', [PenilaianAkhirController::class, 'edit'])->name('penilaian.edit');
-            Route::put('/magang/{magangId}/penilaian/{id}', [PenilaianAkhirController::class, 'update'])->name('penilaian.update');
-            Route::delete('/magang/{magangId}/penilaian/{id}', [PenilaianAkhirController::class, 'destroy'])->name('penilaian.destroy');
-        });
+        Route::get('/penilaian/create', [PenilaianAkhirController::class, 'create'])->name('penilaian.create');
+        Route::post('/penilaian', [PenilaianAkhirController::class, 'store'])->name('penilaian.store');
+        Route::get('/penilaian/{id}/edit', [PenilaianAkhirController::class, 'edit'])->name('penilaian.edit');
+        Route::put('/penilaian/{id}', [PenilaianAkhirController::class, 'update'])->name('penilaian.update');
+        Route::delete('/penilaian/{id}', [PenilaianAkhirController::class, 'destroy'])->name('penilaian.destroy');
     });
 });

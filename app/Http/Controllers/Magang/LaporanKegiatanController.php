@@ -42,67 +42,184 @@ class LaporanKegiatanController extends Controller
 
     public function create()
     {
-        $dataMagangList = DataMagang::all();
-        return view('magang.laporan.create', compact('dataMagangList'));
+        $user = auth()->user();
+
+        // Get data_magang based on role
+        if ($user->role === 'magang') {
+            // Magang only create for their own record
+            $dataMagang = $user->profilPeserta->dataMagang()->first();
+            if (!$dataMagang) {
+                return redirect()->route('laporan.index')->with('error', 'Data magang tidak ditemukan');
+            }
+            return view('magang.laporan.create', compact('dataMagang'));
+        } elseif ($user->role === 'pembimbing') {
+            // Pembimbing can create for peserta they supervise
+            $dataMagangList = DataMagang::where('pembimbing_id', $user->id)
+                ->with('profilPeserta')
+                ->get();
+            return view('magang.laporan.create', compact('dataMagangList'));
+        } else {
+            // HR can create for any peserta
+            $dataMagangList = DataMagang::with('profilPeserta')->get();
+            return view('magang.laporan.create', compact('dataMagangList'));
+        }
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'data_magang_id' => 'required|exists:data_magang,id',
-            'tanggal_laporan' => 'required|date',
-            'deskripsi' => 'required',
-            'lampiran' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
-        ]);
-        $data['status_verifikasi'] = 'menunggu';
+        $user = auth()->user();
+
+        // Validation rules depend on role
+        if ($user->role === 'magang') {
+            $data = $request->validate([
+                'tanggal_laporan' => 'required|date',
+                'deskripsi' => 'required|string|min:20',
+                'lampiran' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ]);
+
+            // Auto-fill data_magang_id for magang
+            $dataMagang = $user->profilPeserta->dataMagang()->first();
+            if (!$dataMagang) {
+                return redirect()->back()->with('error', 'Data magang tidak ditemukan');
+            }
+            $data['data_magang_id'] = $dataMagang->id;
+        } else {
+            $data = $request->validate([
+                'data_magang_id' => 'required|exists:data_magang,id',
+                'tanggal_laporan' => 'required|date',
+                'deskripsi' => 'required|string|min:20',
+                'lampiran' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ]);
+
+            // Verify pembimbing has access
+            if ($user->role === 'pembimbing') {
+                $dataMagang = DataMagang::where('id', $data['data_magang_id'])
+                    ->where('pembimbing_id', $user->id)
+                    ->first();
+                if (!$dataMagang) {
+                    abort(403, 'Unauthorized');
+                }
+            }
+        }
+
+        $lampiranPath = null;
         if ($request->hasFile('lampiran')) {
             $lampiranPath = $request->file('lampiran')->store('laporan/lampiran', 'public');
-        } else {
-            $lampiranPath = null;
         }
+
         LaporanKegiatan::create([
             'data_magang_id' => $data['data_magang_id'],
             'tanggal_laporan' => $data['tanggal_laporan'],
             'deskripsi' => $data['deskripsi'],
             'path_lampiran' => $lampiranPath,
-            'status_verifikasi' => $data['status_verifikasi'],
+            'status_verifikasi' => 'menunggu',
         ]);
-        return redirect()->route('laporan.index', [$data['data_magang_id']])->with('success', 'Laporan berhasil dibuat');
+
+        return redirect()->route('laporan.index')->with('success', 'Laporan berhasil dibuat');
     }
 
     public function edit($id)
     {
-        $laporan = LaporanKegiatan::findOrFail($id);
-        $dataMagangList = DataMagang::all();
-        return view('magang.laporan.edit', compact('laporan', 'dataMagangList'));
+        $laporan = LaporanKegiatan::with('dataMagang.profilPeserta')->findOrFail($id);
+        $user = auth()->user();
+
+        // Verify access
+        if ($user->role === 'magang') {
+            $dataMagang = $user->profilPeserta->dataMagang()->first();
+            if (!$dataMagang || $laporan->data_magang_id !== $dataMagang->id) {
+                abort(403, 'Unauthorized');
+            }
+            return view('magang.laporan.edit', compact('laporan'));
+        } elseif ($user->role === 'pembimbing') {
+            if ($laporan->dataMagang->pembimbing_id !== $user->id) {
+                abort(403, 'Unauthorized');
+            }
+            $dataMagangList = DataMagang::where('pembimbing_id', $user->id)
+                ->with('profilPeserta')
+                ->get();
+            return view('magang.laporan.edit', compact('laporan', 'dataMagangList'));
+        } else {
+            // HR can edit any
+            $dataMagangList = DataMagang::with('profilPeserta')->get();
+            return view('magang.laporan.edit', compact('laporan', 'dataMagangList'));
+        }
     }
 
-    public function update(Request $request, $magangId, $id)
+    public function update(Request $request, $id)
     {
         $laporan = LaporanKegiatan::findOrFail($id);
-        $data = $request->validate([
-            'data_magang_id' => 'required|exists:data_magang,id',
-            'tanggal_laporan' => 'required|date',
-            'deskripsi' => 'required',
-            'lampiran' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
-        ]);
+        $user = auth()->user();
+
+        // Verify access
+        if ($user->role === 'magang') {
+            $dataMagang = $user->profilPeserta->dataMagang()->first();
+            if (!$dataMagang || $laporan->data_magang_id !== $dataMagang->id) {
+                abort(403, 'Unauthorized');
+            }
+            // Magang cannot change data_magang_id
+            $data = $request->validate([
+                'tanggal_laporan' => 'required|date',
+                'deskripsi' => 'required|string|min:20',
+                'lampiran' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ]);
+            $data['data_magang_id'] = $dataMagang->id;
+        } else {
+            // Pembimbing/HR can change data_magang_id
+            $data = $request->validate([
+                'data_magang_id' => 'required|exists:data_magang,id',
+                'tanggal_laporan' => 'required|date',
+                'deskripsi' => 'required|string|min:20',
+                'lampiran' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ]);
+
+            // Verify pembimbing access
+            if ($user->role === 'pembimbing') {
+                if ($laporan->dataMagang->pembimbing_id !== $user->id) {
+                    abort(403, 'Unauthorized');
+                }
+                // Verify new data_magang_id also belongs to pembimbing
+                $newDataMagang = DataMagang::where('id', $data['data_magang_id'])
+                    ->where('pembimbing_id', $user->id)
+                    ->first();
+                if (!$newDataMagang) {
+                    abort(403, 'Unauthorized');
+                }
+            }
+        }
+
         if ($request->hasFile('lampiran')) {
             $lampiranPath = $request->file('lampiran')->store('laporan/lampiran', 'public');
         } else {
             $lampiranPath = $laporan->path_lampiran;
         }
+
         $laporan->update([
             'data_magang_id' => $data['data_magang_id'],
             'tanggal_laporan' => $data['tanggal_laporan'],
             'deskripsi' => $data['deskripsi'],
             'path_lampiran' => $lampiranPath,
         ]);
-        return redirect()->route('laporan.index', [$data['data_magang_id']])->with('success', 'Laporan berhasil diupdate');
+
+        return redirect()->route('laporan.index')->with('success', 'Laporan berhasil diupdate');
     }
 
     public function destroy($id)
     {
         $laporan = LaporanKegiatan::findOrFail($id);
+        $user = auth()->user();
+
+        // Verify access
+        if ($user->role === 'magang') {
+            $dataMagang = $user->profilPeserta->dataMagang()->first();
+            if (!$dataMagang || $laporan->data_magang_id !== $dataMagang->id) {
+                abort(403, 'Unauthorized');
+            }
+        } elseif ($user->role === 'pembimbing') {
+            if ($laporan->dataMagang->pembimbing_id !== $user->id) {
+                abort(403, 'Unauthorized');
+            }
+        }
+
         $laporan->delete();
         return redirect()->route('laporan.index')->with('success', 'Laporan berhasil dihapus');
     }

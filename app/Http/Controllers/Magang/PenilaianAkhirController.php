@@ -45,27 +45,36 @@ class PenilaianAkhirController extends Controller
         return view('magang.penilaian.index', compact('penilaianList'));
     }
 
-    public function create($magangId)
+    public function create()
     {
-        $dataMagang = DataMagang::with('profilPeserta')->findOrFail($magangId);
-        return view('magang.penilaian.create', compact('magangId', 'dataMagang'));
+        $user = auth()->user();
+
+        // Only pembimbing & hr can create penilaian
+        if (!in_array($user->role, ['pembimbing', 'hr'])) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Get list peserta for dropdown
+        if ($user->role === 'pembimbing') {
+            $dataMagang = DataMagang::where('pembimbing_id', $user->id)
+                ->whereDoesntHave('penilaianAkhir') // Only peserta without penilaian
+                ->with('profilPeserta')
+                ->get();
+        } elseif ($user->role === 'hr') {
+            $dataMagang = DataMagang::whereDoesntHave('penilaianAkhir')
+                ->with('profilPeserta')
+                ->get();
+        }
+
+        return view('magang.penilaian.create', compact('dataMagang'));
     }
 
-    public function store(Request $request, $magangId)
+    public function store(Request $request)
     {
-        $dataMagang = DataMagang::findOrFail($magangId);
-
-        // Check if penilaian already exists
-        if ($dataMagang->penilaianAkhir) {
-            return redirect()->back()->with('error', 'Penilaian akhir sudah ada untuk magang ini');
-        }
-
-        // Only pembimbing can create penilaian
-        if (Auth::user()->role !== 'pembimbing' || $dataMagang->pembimbing_id !== Auth::id()) {
-            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk menilai magang ini');
-        }
+        $user = auth()->user();
 
         $data = $request->validate([
+            'data_magang_id' => 'required|exists:data_magang,id',
             'nilai_kehadiran' => 'required|numeric|min:0|max:100',
             'nilai_kedisiplinan' => 'required|numeric|min:0|max:100',
             'nilai_keterampilan' => 'required|numeric|min:0|max:100',
@@ -73,6 +82,18 @@ class PenilaianAkhirController extends Controller
             'umpan_balik' => 'required|string|min:20',
             'surat_nilai' => 'nullable|file|mimes:pdf',
         ]);
+
+        $dataMagang = DataMagang::findOrFail($data['data_magang_id']);
+
+        // Check if penilaian already exists
+        if ($dataMagang->penilaianAkhir) {
+            return redirect()->back()->with('error', 'Penilaian akhir sudah ada untuk peserta ini');
+        }
+
+        // Verify access
+        if ($user->role === 'pembimbing' && $dataMagang->pembimbing_id !== $user->id) {
+            abort(403, 'Unauthorized - Anda tidak membimbing peserta ini');
+        }
 
         // Calculate average score
         $nilaiRataRata = ($data['nilai_kehadiran'] + $data['nilai_kedisiplinan'] +
@@ -84,7 +105,7 @@ class PenilaianAkhirController extends Controller
         }
 
         PenilaianAkhir::create([
-            'data_magang_id' => $magangId,
+            'data_magang_id' => $data['data_magang_id'],
             'nilai_kehadiran' => $data['nilai_kehadiran'],
             'nilai_kedisiplinan' => $data['nilai_kedisiplinan'],
             'nilai_keterampilan' => $data['nilai_keterampilan'],
@@ -101,27 +122,102 @@ class PenilaianAkhirController extends Controller
         return redirect()->route('penilaian.index')->with('success', 'Penilaian akhir berhasil dibuat');
     }
 
-    public function edit($magangId, $id)
+    public function show($id)
     {
         $penilaian = PenilaianAkhir::with('dataMagang.profilPeserta')->findOrFail($id);
-        return view('magang.penilaian.edit', compact('penilaian', 'magangId'));
+        $user = auth()->user();
+
+        // Verify access
+        if ($user->role === 'magang') {
+            // Magang only see their own
+            $dataMagang = $user->profilPeserta->dataMagang()->first();
+            if (!$dataMagang || $penilaian->data_magang_id !== $dataMagang->id) {
+                abort(403, 'Unauthorized');
+            }
+        } elseif ($user->role === 'pembimbing') {
+            // Pembimbing only see peserta they supervise
+            if ($penilaian->dataMagang->pembimbing_id !== $user->id) {
+                abort(403, 'Unauthorized');
+            }
+        }
+
+        return view('magang.penilaian.show', compact('penilaian'));
     }
 
-    public function update(Request $request, $magangId, $id)
+    public function edit($id)
+    {
+        $penilaian = PenilaianAkhir::with('dataMagang.profilPeserta')->findOrFail($id);
+        $user = auth()->user();
+
+        // Verify access
+        if ($user->role === 'pembimbing' && $penilaian->dataMagang->pembimbing_id !== $user->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Get list peserta for dropdown
+        if ($user->role === 'pembimbing') {
+            $dataMagang = DataMagang::where('pembimbing_id', $user->id)
+                ->with('profilPeserta')
+                ->get();
+        } elseif ($user->role === 'hr') {
+            $dataMagang = DataMagang::with('profilPeserta')->get();
+        }
+
+        return view('magang.penilaian.edit', compact('penilaian', 'dataMagang'));
+    }
+
+    public function update(Request $request, $id)
     {
         $penilaian = PenilaianAkhir::findOrFail($id);
+        $user = auth()->user();
+
+        // Verify access
+        if ($user->role === 'pembimbing' && $penilaian->dataMagang->pembimbing_id !== $user->id) {
+            abort(403, 'Unauthorized');
+        }
+
         $data = $request->validate([
-            'nilai' => 'required|numeric|min:0|max:4',
-            'umpan_balik' => 'nullable|string',
-            'path_surat_nilai' => 'nullable|string',
+            'data_magang_id' => 'required|exists:data_magang,id',
+            'nilai_kehadiran' => 'required|numeric|min:0|max:100',
+            'nilai_kedisiplinan' => 'required|numeric|min:0|max:100',
+            'nilai_keterampilan' => 'required|numeric|min:0|max:100',
+            'nilai_sikap' => 'required|numeric|min:0|max:100',
+            'umpan_balik' => 'required|string|min:20',
+            'surat_nilai' => 'nullable|file|mimes:pdf',
         ]);
-        $penilaian->update($data);
+
+        // Calculate average score
+        $nilaiRataRata = ($data['nilai_kehadiran'] + $data['nilai_kedisiplinan'] +
+            $data['nilai_keterampilan'] + $data['nilai_sikap']) / 4;
+
+        $updateData = [
+            'data_magang_id' => $data['data_magang_id'],
+            'nilai_kehadiran' => $data['nilai_kehadiran'],
+            'nilai_kedisiplinan' => $data['nilai_kedisiplinan'],
+            'nilai_keterampilan' => $data['nilai_keterampilan'],
+            'nilai_sikap' => $data['nilai_sikap'],
+            'nilai_rata_rata' => $nilaiRataRata,
+            'umpan_balik' => $data['umpan_balik'],
+        ];
+
+        if ($request->hasFile('surat_nilai')) {
+            $updateData['path_surat_nilai'] = $request->file('surat_nilai')->store('surat_nilai', 'public');
+        }
+
+        $penilaian->update($updateData);
         return redirect()->route('penilaian.index')->with('success', 'Penilaian akhir berhasil diupdate');
     }
 
-    public function destroy($magangId, $id)
+    public function destroy($id)
     {
         $penilaian = PenilaianAkhir::findOrFail($id);
+        $user = auth()->user();
+
+        // Verify access
+        if ($user->role === 'pembimbing' && $penilaian->dataMagang->pembimbing_id !== $user->id) {
+            abort(403, 'Unauthorized');
+        }
+
         $penilaian->delete();
         return redirect()->route('penilaian.index')->with('success', 'Penilaian akhir berhasil dihapus');
     }
