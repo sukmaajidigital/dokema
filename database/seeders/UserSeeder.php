@@ -47,29 +47,5 @@ class UserSeeder extends Seeder
             'role' => 'pembimbing',
             'email_verified_at' => now(),
         ]);
-
-        // Magang Users
-        $magangUsers = [
-            ['name' => 'Andi Pratama', 'email' => 'andi.pratama@gmail.com'],
-            ['name' => 'Siti Nurhaliza', 'email' => 'siti.nurhaliza@gmail.com'],
-            ['name' => 'Reza Maulana', 'email' => 'reza.maulana@gmail.com'],
-            ['name' => 'Dewi Lestari', 'email' => 'dewi.lestari@gmail.com'],
-            ['name' => 'Fajar Nugroho', 'email' => 'fajar.nugroho@gmail.com'],
-            ['name' => 'Maya Sari', 'email' => 'maya.sari@gmail.com'],
-            ['name' => 'Dimas Aditya', 'email' => 'dimas.aditya@gmail.com'],
-            ['name' => 'Putri Amelia', 'email' => 'putri.amelia@gmail.com'],
-            ['name' => 'Ryan Kurniawan', 'email' => 'ryan.kurniawan@gmail.com'],
-            ['name' => 'Indah Permata', 'email' => 'indah.permata@gmail.com'],
-        ];
-
-        foreach ($magangUsers as $user) {
-            User::create([
-                'name' => $user['name'],
-                'email' => $user['email'],
-                'password' => Hash::make('password'),
-                'role' => 'magang',
-                'email_verified_at' => now(),
-            ]);
-        }
     }
 }
