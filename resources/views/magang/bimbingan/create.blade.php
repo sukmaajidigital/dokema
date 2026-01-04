@@ -6,9 +6,9 @@
     <div class="max-w-4xl mx-auto">
         @include('magang.bimbingan.form', [
             'logBimbingan' => null,
-            'action' => route('bimbingan.store', $magangId),
+            'action' => route('bimbingan.store'),
             'method' => 'POST',
-            'magangs' => $datamagangs ?? [],
+            'magangs' => $dataMagang ?? [],
         ])
     </div>
 </x-admin-layouts>

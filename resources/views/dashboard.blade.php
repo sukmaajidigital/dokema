@@ -4,70 +4,144 @@
     </x-slot>
     <div class="space-y-6">
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Total Peserta -->
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600">Total Peserta</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ $totalPeserta }}</p>
-                    </div>
-                    <div class="p-3 bg-blue-100 rounded-full">
-                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
-                        </svg>
+        @if (Auth::user()->role === 'magang')
+            <!-- Magang Dashboard Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Info Pembimbing -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-600 mb-2">Pembimbing</p>
+                            @if (isset($dataMagang) && $dataMagang && $dataMagang->pembimbing)
+                                <p class="text-xl font-bold text-gray-900">{{ $dataMagang->pembimbing->name }}</p>
+                                <p class="text-sm text-gray-500 mt-1">{{ $dataMagang->pembimbing->email }}</p>
+                            @else
+                                <p class="text-lg font-medium text-gray-500">Belum ditentukan</p>
+                            @endif
+                        </div>
+                        <div class="p-3 bg-blue-100 rounded-full">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Total Magang -->
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600">Total Magang</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ $totalMagang }}</p>
-                    </div>
-                    <div class="p-3 bg-green-100 rounded-full">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
-                        </svg>
+                <!-- Status Magang -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600 mb-2">Status Magang</p>
+                            @if (isset($dataMagang) && $dataMagang)
+                                @if ($dataMagang->status === 'diterima')
+                                    <p class="text-2xl font-bold text-green-600">Diterima</p>
+                                @elseif($dataMagang->status === 'ditolak')
+                                    <p class="text-2xl font-bold text-red-600">Ditolak</p>
+                                @else
+                                    <p class="text-2xl font-bold text-yellow-600">Menunggu</p>
+                                @endif
+                            @else
+                                <p class="text-lg font-medium text-gray-500">Belum ada data</p>
+                            @endif
+                        </div>
+                        <div class="p-3 bg-green-100 rounded-full">
+                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Magang Aktif -->
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600">Magang Aktif</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ $magangAktif }}</p>
-                    </div>
-                    <div class="p-3 bg-yellow-100 rounded-full">
-                        <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
+                <!-- Periode Magang -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-600 mb-2">Periode Magang</p>
+                            @if (isset($dataMagang) && $dataMagang)
+                                <p class="text-sm font-semibold text-gray-900">{{ \Carbon\Carbon::parse($dataMagang->tanggal_mulai)->format('d M Y') }}</p>
+                                <p class="text-xs text-gray-500">s/d</p>
+                                <p class="text-sm font-semibold text-gray-900">{{ \Carbon\Carbon::parse($dataMagang->tanggal_selesai)->format('d M Y') }}</p>
+                            @else
+                                <p class="text-lg font-medium text-gray-500">Belum ditentukan</p>
+                            @endif
+                        </div>
+                        <div class="p-3 bg-purple-100 rounded-full">
+                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </div>
+        @else
+            <!-- HR & Pembimbing Dashboard Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Total Peserta -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Total Peserta</p>
+                            <p class="text-3xl font-bold text-gray-900">{{ $totalPeserta }}</p>
+                        </div>
+                        <div class="p-3 bg-blue-100 rounded-full">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
 
-            <!-- Menunggu Approval -->
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500 cursor-pointer hover:bg-orange-50" onclick="window.location.href='{{ route('workflow.approval') }}'">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600">Menunggu Approval</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ $magangMenunggu }}</p>
-                        @if ($magangMenunggu > 0)
-                            <p class="text-xs text-orange-600 font-medium">Klik untuk proses</p>
-                        @endif
-                    </div>
-                    <div class="p-3 bg-orange-100 rounded-full">
-                        <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
+                <!-- Total Magang -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Total Magang</p>
+                            <p class="text-3xl font-bold text-gray-900">{{ $totalMagang }}</p>
+                        </div>
+                        <div class="p-3 bg-green-100 rounded-full">
+                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
+                            </svg>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Magang Aktif -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Magang Aktif</p>
+                            <p class="text-3xl font-bold text-gray-900">{{ $magangAktif }}</p>
+                        </div>
+                        <div class="p-3 bg-yellow-100 rounded-full">
+                            <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menunggu Approval -->
+                @if (Auth::user()->role === 'hr')
+                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500 cursor-pointer hover:bg-orange-50" onclick="window.location.href='{{ route('workflow.approval') }}'">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Menunggu Approval</p>
+                                <p class="text-3xl font-bold text-gray-900">{{ $magangMenunggu }}</p>
+                                @if ($magangMenunggu > 0)
+                                    <p class="text-xs text-orange-600 font-medium">Klik untuk proses</p>
+                                @endif
+                            </div>
+                            <div class="p-3 bg-orange-100 rounded-full">
+                                <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
-        </div>
+        @endif
 
         <!-- Additional Statistics Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
@@ -101,222 +175,182 @@
                 </div>
             </div>
         </div>
-        <!-- Total Peserta -->
-        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Total Peserta</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ $totalPeserta }}</p>
+
+        <!-- Charts and Recent Activities -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Status Magang Chart -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Status Magang</h3>
+                <div class="space-y-3">
+                    @php
+                        $colors = ['diterima' => 'green', 'menunggu' => 'yellow', 'ditolak' => 'red'];
+                        $totalStatus = array_sum($statusMagang);
+                    @endphp
+                    @foreach ($statusMagang as $status => $count)
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 rounded-full bg-{{ $colors[$status] ?? 'gray' }}-500 mr-2"></div>
+                                <span class="text-sm font-medium text-gray-700 capitalize">{{ $status }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-sm text-gray-600 mr-2">{{ $count }}</span>
+                                <span class="text-xs text-gray-500">({{ $totalStatus > 0 ? round(($count / $totalStatus) * 100, 1) : 0 }}%)</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-{{ $colors[$status] ?? 'gray' }}-500 h-2 rounded-full" style="width: {{ $totalStatus > 0 ? ($count / $totalStatus) * 100 : 0 }}%"></div>
+                        </div>
+                    @endforeach
                 </div>
-                <div class="p-3 bg-blue-100 rounded-full">
-                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
-                    </svg>
+            </div>
+
+            <!-- Magang Akan Berakhir -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Magang Akan Berakhir</h3>
+                <div class="space-y-3">
+                    @forelse($magangAkanBerakhir as $magang)
+                        <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900">{{ $magang->profilPeserta->nama ?? 'N/A' }}</p>
+                                <p class="text-sm text-gray-600">Program Magang</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-red-600">
+                                    {{ $magang->tanggal_selesai ? \Carbon\Carbon::parse($magang->tanggal_selesai)->format('d M Y') : 'N/A' }}
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    {{ $magang->tanggal_selesai ? \Carbon\Carbon::parse($magang->tanggal_selesai)->diffForHumans() : 'N/A' }}
+                                </p>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-4">
+                            <p class="text-gray-500">Tidak ada magang yang akan berakhir dalam 30 hari ke depan</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
 
-        <!-- Total Magang -->
-        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Total Magang</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ $totalMagang }}</p>
+        <!-- Recent Activities -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Laporan Terbaru -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Laporan Terbaru</h3>
+                    <a href="{{ route('laporan.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Semua</a>
                 </div>
-                <div class="p-3 bg-green-100 rounded-full">
-                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="space-y-3">
+                    @forelse($laporanTerbaru as $laporan)
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900">{{ $laporan->dataMagang->profilPeserta->nama ?? 'N/A' }}</p>
+                                <p class="text-sm text-gray-600">{{ Str::limit($laporan->deskripsi ?? 'Laporan kegiatan', 50) }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">{{ $laporan->tanggal_laporan ? \Carbon\Carbon::parse($laporan->tanggal_laporan)->format('d M Y') : 'N/A' }}</p>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-4">
+                            <p class="text-gray-500">Belum ada laporan yang dibuat</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- Bimbingan Terbaru -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Bimbingan Terbaru</h3>
+                    <a href="{{ route('bimbingan.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Semua</a>
+                </div>
+                <div class="space-y-3">
+                    @forelse($bimbinganTerbaru as $bimbingan)
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900">{{ $bimbingan->dataMagang->profilPeserta->nama ?? 'N/A' }}</p>
+                                <p class="text-sm text-gray-600">{{ Str::limit($bimbingan->catatan_peserta ?? ($bimbingan->catatan_pembimbing ?? 'Catatan bimbingan'), 50) }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">{{ $bimbingan->waktu_bimbingan ? \Carbon\Carbon::parse($bimbingan->waktu_bimbingan)->format('d M Y') : 'N/A' }}</p>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-4">
+                            <p class="text-gray-500">Belum ada bimbingan yang dilakukan</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Aksi Cepat</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                @if (Auth::user()->role === 'hr')
+                    <a href="{{ route('profil.create') }}" class="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <svg class="w-8 h-8 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                        </svg>
+                        <span class="text-sm font-medium text-blue-700">Tambah Peserta</span>
+                    </a>
+
+                    <a href="{{ route('magang.create') }}" class="flex flex-col items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <svg class="w-8 h-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span class="text-sm font-medium text-green-700">Tambah Magang</span>
+                    </a>
+
+                    <a href="{{ route('user.create') }}" class="flex flex-col items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                        <svg class="w-8 h-8 text-purple-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        <span class="text-sm font-medium text-purple-700">Tambah User</span>
+                    </a>
+                @endif
+
+                @if (Auth::user()->role === 'magang')
+                    <a href="{{ route('laporan.create') }}" class="flex flex-col items-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors">
+                        <svg class="w-8 h-8 text-yellow-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="text-sm font-medium text-yellow-700">Buat Laporan</span>
+                    </a>
+                @endif
+
+                @if (Auth::user()->role === 'pembimbing' || Auth::user()->role === 'hr')
+                    <a href="{{ route('bimbingan.create') }}" class="flex flex-col items-center p-4 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors">
+                        <svg class="w-8 h-8 text-indigo-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        <span class="text-sm font-medium text-indigo-700">Tambah Bimbingan</span>
+                    </a>
+
+                    <a href="{{ route('penilaian.create') }}" class="flex flex-col items-center p-4 bg-pink-50 rounded-lg hover:bg-pink-100 transition-colors">
+                        <svg class="w-8 h-8 text-pink-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                        <span class="text-sm font-medium text-pink-700">Buat Penilaian</span>
+                    </a>
+                @endif
+
+                <a href="{{ route('profil.index') }}" class="flex flex-col items-center p-4 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors">
+                    <svg class="w-8 h-8 text-indigo-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-indigo-700">{{ Auth::user()->role === 'magang' ? 'Profil Saya' : 'Kelola Profil' }}</span>
+                </a>
+
+                <a href="{{ route('magang.index') }}" class="flex flex-col items-center p-4 bg-pink-50 rounded-lg hover:bg-pink-100 transition-colors">
+                    <svg class="w-8 h-8 text-pink-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
                     </svg>
-                </div>
+                    <span class="text-sm font-medium text-pink-700">{{ Auth::user()->role === 'magang' ? 'Data Magang' : 'Kelola Magang' }}</span>
+                </a>
             </div>
         </div>
-
-        <!-- Magang Aktif -->
-        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Magang Aktif</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ $magangAktif }}</p>
-                </div>
-                <div class="p-3 bg-yellow-100 rounded-full">
-                    <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Total Laporan -->
-        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Total Laporan</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ $totalLaporan }}</p>
-                </div>
-                <div class="p-3 bg-purple-100 rounded-full">
-                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Charts and Recent Activities -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Status Magang Chart -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Status Magang</h3>
-            <div class="space-y-3">
-                @php
-                    $colors = ['diterima' => 'green', 'menunggu' => 'yellow', 'ditolak' => 'red'];
-                    $totalStatus = array_sum($statusMagang);
-                @endphp
-                @foreach ($statusMagang as $status => $count)
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 rounded-full bg-{{ $colors[$status] ?? 'gray' }}-500 mr-2"></div>
-                            <span class="text-sm font-medium text-gray-700 capitalize">{{ $status }}</span>
-                        </div>
-                        <div class="flex items-center">
-                            <span class="text-sm text-gray-600 mr-2">{{ $count }}</span>
-                            <span class="text-xs text-gray-500">({{ $totalStatus > 0 ? round(($count / $totalStatus) * 100, 1) : 0 }}%)</span>
-                        </div>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-{{ $colors[$status] ?? 'gray' }}-500 h-2 rounded-full" style="width: {{ $totalStatus > 0 ? ($count / $totalStatus) * 100 : 0 }}%"></div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-
-        <!-- Magang Akan Berakhir -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Magang Akan Berakhir</h3>
-            <div class="space-y-3">
-                @forelse($magangAkanBerakhir as $magang)
-                    <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                        <div>
-                            <p class="font-medium text-gray-900">{{ $magang->profilPeserta->nama ?? 'N/A' }}</p>
-                            <p class="text-sm text-gray-600">Program Magang</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm font-medium text-red-600">
-                                {{ $magang->tanggal_selesai ? \Carbon\Carbon::parse($magang->tanggal_selesai)->format('d M Y') : 'N/A' }}
-                            </p>
-                            <p class="text-xs text-gray-500">
-                                {{ $magang->tanggal_selesai ? \Carbon\Carbon::parse($magang->tanggal_selesai)->diffForHumans() : 'N/A' }}
-                            </p>
-                        </div>
-                    </div>
-                @empty
-                    <div class="text-center py-4">
-                        <p class="text-gray-500">Tidak ada magang yang akan berakhir dalam 30 hari ke depan</p>
-                    </div>
-                @endforelse
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Activities -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Laporan Terbaru -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Laporan Terbaru</h3>
-                <a href="{{ route('laporan.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Semua</a>
-            </div>
-            <div class="space-y-3">
-                @forelse($laporanTerbaru as $laporan)
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                            <p class="font-medium text-gray-900">{{ $laporan->dataMagang->profilPeserta->nama ?? 'N/A' }}</p>
-                            <p class="text-sm text-gray-600">{{ Str::limit($laporan->deskripsi ?? 'Laporan kegiatan', 50) }}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm text-gray-500">{{ $laporan->tanggal_laporan ? \Carbon\Carbon::parse($laporan->tanggal_laporan)->format('d M Y') : 'N/A' }}</p>
-                        </div>
-                    </div>
-                @empty
-                    <div class="text-center py-4">
-                        <p class="text-gray-500">Belum ada laporan yang dibuat</p>
-                    </div>
-                @endforelse
-            </div>
-        </div>
-
-        <!-- Bimbingan Terbaru -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Bimbingan Terbaru</h3>
-                <a href="{{ route('bimbingan.index', 1) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Semua</a>
-            </div>
-            <div class="space-y-3">
-                @forelse($bimbinganTerbaru as $bimbingan)
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                            <p class="font-medium text-gray-900">{{ $bimbingan->dataMagang->profilPeserta->nama ?? 'N/A' }}</p>
-                            <p class="text-sm text-gray-600">{{ Str::limit($bimbingan->catatan_peserta ?? ($bimbingan->catatan_pembimbing ?? 'Catatan bimbingan'), 50) }}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm text-gray-500">{{ $bimbingan->waktu_bimbingan ? \Carbon\Carbon::parse($bimbingan->waktu_bimbingan)->format('d M Y') : 'N/A' }}</p>
-                        </div>
-                    </div>
-                @empty
-                    <div class="text-center py-4">
-                        <p class="text-gray-500">Belum ada bimbingan yang dilakukan</p>
-                    </div>
-                @endforelse
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Aksi Cepat</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <a href="{{ route('profil.create') }}" class="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                <svg class="w-8 h-8 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-                </svg>
-                <span class="text-sm font-medium text-blue-700">Tambah Peserta</span>
-            </a>
-
-            <a href="{{ route('magang.create') }}" class="flex flex-col items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                <svg class="w-8 h-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
-                <span class="text-sm font-medium text-green-700">Tambah Magang</span>
-            </a>
-
-            <a href="{{ route('laporan.create') }}" class="flex flex-col items-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors">
-                <svg class="w-8 h-8 text-yellow-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                <span class="text-sm font-medium text-yellow-700">Buat Laporan</span>
-            </a>
-
-            <a href="{{ route('user.create') }}" class="flex flex-col items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                <svg class="w-8 h-8 text-purple-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                </svg>
-                <span class="text-sm font-medium text-purple-700">Tambah User</span>
-            </a>
-
-            <a href="{{ route('profil.index') }}" class="flex flex-col items-center p-4 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors">
-                <svg class="w-8 h-8 text-indigo-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                </svg>
-                <span class="text-sm font-medium text-indigo-700">Kelola Profil</span>
-            </a>
-
-            <a href="{{ route('magang.index') }}" class="flex flex-col items-center p-4 bg-pink-50 rounded-lg hover:bg-pink-100 transition-colors">
-                <svg class="w-8 h-8 text-pink-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
-                </svg>
-                <span class="text-sm font-medium text-pink-700">Kelola Magang</span>
-            </a>
-        </div>
-    </div>
     </div>
 </x-admin-layouts>
