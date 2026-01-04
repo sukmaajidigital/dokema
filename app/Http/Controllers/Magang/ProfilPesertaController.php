@@ -30,7 +30,7 @@ class ProfilPesertaController extends Controller
 
     public function create()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Only HR can create new profiles
         if ($user->role !== 'hr') {
@@ -46,7 +46,7 @@ class ProfilPesertaController extends Controller
 
     public function store(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Only HR can create new profiles
         if ($user->role !== 'hr') {
@@ -70,7 +70,7 @@ class ProfilPesertaController extends Controller
     public function edit($id)
     {
         $profil = ProfilPeserta::with('user')->findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'magang') {
@@ -96,7 +96,7 @@ class ProfilPesertaController extends Controller
     public function update(Request $request, $id)
     {
         $profil = ProfilPeserta::findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'magang') {
@@ -150,7 +150,7 @@ class ProfilPesertaController extends Controller
     public function show($id)
     {
         $profil = ProfilPeserta::with(['user', 'dataMagang'])->findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'magang') {
@@ -171,7 +171,7 @@ class ProfilPesertaController extends Controller
 
     public function destroy($id)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Only HR can delete profiles
         if ($user->role !== 'hr') {

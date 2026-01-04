@@ -47,7 +47,7 @@ class PenilaianAkhirController extends Controller
 
     public function create()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Only pembimbing & hr can create penilaian
         if (!in_array($user->role, ['pembimbing', 'hr'])) {
@@ -71,7 +71,7 @@ class PenilaianAkhirController extends Controller
 
     public function store(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         $data = $request->validate([
             'data_magang_id' => 'required|exists:data_magang,id',
@@ -125,7 +125,7 @@ class PenilaianAkhirController extends Controller
     public function show($id)
     {
         $penilaian = PenilaianAkhir::with('dataMagang.profilPeserta')->findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'magang') {
@@ -147,7 +147,7 @@ class PenilaianAkhirController extends Controller
     public function edit($id)
     {
         $penilaian = PenilaianAkhir::with('dataMagang.profilPeserta')->findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'pembimbing' && $penilaian->dataMagang->pembimbing_id !== $user->id) {
@@ -169,7 +169,7 @@ class PenilaianAkhirController extends Controller
     public function update(Request $request, $id)
     {
         $penilaian = PenilaianAkhir::findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'pembimbing' && $penilaian->dataMagang->pembimbing_id !== $user->id) {
@@ -211,7 +211,7 @@ class PenilaianAkhirController extends Controller
     public function destroy($id)
     {
         $penilaian = PenilaianAkhir::findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'pembimbing' && $penilaian->dataMagang->pembimbing_id !== $user->id) {

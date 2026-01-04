@@ -6,12 +6,13 @@ use App\Models\LogBimbingan;
 use App\Models\DataMagang;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class LogBimbinganController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if ($user->role === 'hr') {
             // HR: Lihat semua log bimbingan
@@ -34,7 +35,7 @@ class LogBimbinganController extends Controller
 
     public function create()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Get list peserta for dropdown (pembimbing & hr only)
         if ($user->role === 'pembimbing') {
@@ -61,7 +62,7 @@ class LogBimbinganController extends Controller
         ]);
 
         // Verify user has access to this data_magang
-        $user = auth()->user();
+        $user = Auth::user();
         $dataMagang = DataMagang::findOrFail($data['data_magang_id']);
 
         if ($user->role === 'pembimbing' && $dataMagang->pembimbing_id !== $user->id) {
@@ -75,7 +76,7 @@ class LogBimbinganController extends Controller
     public function edit($id)
     {
         $log = LogBimbingan::with('dataMagang.profilPeserta')->findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'pembimbing' && $log->dataMagang->pembimbing_id !== $user->id) {
@@ -97,7 +98,7 @@ class LogBimbinganController extends Controller
     public function update(Request $request, $id)
     {
         $log = LogBimbingan::findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'pembimbing' && $log->dataMagang->pembimbing_id !== $user->id) {
@@ -118,7 +119,7 @@ class LogBimbinganController extends Controller
     public function destroy($id)
     {
         $log = LogBimbingan::findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'pembimbing' && $log->dataMagang->pembimbing_id !== $user->id) {

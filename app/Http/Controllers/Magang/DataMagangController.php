@@ -12,7 +12,7 @@ class DataMagangController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Filter data magang berdasarkan role
         if ($user->role === 'magang') {
@@ -38,7 +38,7 @@ class DataMagangController extends Controller
 
     public function create()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Only HR can manually create data magang
         if ($user->role !== 'hr') {
@@ -53,7 +53,7 @@ class DataMagangController extends Controller
 
     public function store(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Only HR can manually create data magang
         if ($user->role !== 'hr') {
@@ -97,7 +97,7 @@ class DataMagangController extends Controller
     public function edit($id)
     {
         $magang = DataMagang::with(['profilPeserta', 'pembimbing'])->findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'magang') {
@@ -122,7 +122,7 @@ class DataMagangController extends Controller
     public function update(Request $request, $id)
     {
         $magang = DataMagang::findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access and validate based on role
         if ($user->role === 'magang') {
@@ -183,7 +183,7 @@ class DataMagangController extends Controller
     public function show($id)
     {
         $magang = DataMagang::with(['profilPeserta.user', 'pembimbing', 'laporanKegiatan', 'logBimbingan', 'penilaianAkhir'])->findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'magang') {
@@ -204,7 +204,7 @@ class DataMagangController extends Controller
 
     public function destroy($id)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Only HR can delete data magang
         if ($user->role !== 'hr') {

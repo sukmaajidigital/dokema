@@ -42,7 +42,7 @@ class LaporanKegiatanController extends Controller
 
     public function create()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Get data_magang based on role
         if ($user->role === 'magang') {
@@ -67,7 +67,7 @@ class LaporanKegiatanController extends Controller
 
     public function store(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Validation rules depend on role
         if ($user->role === 'magang') {
@@ -121,7 +121,7 @@ class LaporanKegiatanController extends Controller
     public function edit($id)
     {
         $laporan = LaporanKegiatan::with('dataMagang.profilPeserta')->findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'magang') {
@@ -148,7 +148,7 @@ class LaporanKegiatanController extends Controller
     public function update(Request $request, $id)
     {
         $laporan = LaporanKegiatan::findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'magang') {
@@ -206,7 +206,7 @@ class LaporanKegiatanController extends Controller
     public function destroy($id)
     {
         $laporan = LaporanKegiatan::findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Verify access
         if ($user->role === 'magang') {
