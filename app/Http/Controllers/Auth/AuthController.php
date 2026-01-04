@@ -100,6 +100,9 @@ class AuthController extends Controller
             'jurusan' => ['required', 'string', 'max:255'],
             'nim' => ['required', 'string', 'max:50', 'unique:profil_peserta'],
             'no_hp' => ['required', 'string', 'max:15'],
+            'tanggal_mulai' => ['required', 'date', 'after_or_equal:today'],
+            'tanggal_selesai' => ['required', 'date', 'after:tanggal_mulai'],
+            'surat_permohonan' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
         ]);
 
         // Create user account
@@ -110,7 +113,7 @@ class AuthController extends Controller
             'role' => 'magang', // Default role for registration
         ]);
 
-        // Create profil_peserta - simpan NIM/NISN ke field nim
+        // Create profil_peserta
         $profilPeserta = \App\Models\ProfilPeserta::create([
             'user_id' => $user->id,
             'nama_peserta' => $validated['nama_peserta'],
@@ -120,12 +123,21 @@ class AuthController extends Controller
             'no_telepon' => $validated['no_hp'],
         ]);
 
+        // Handle file upload for surat_permohonan
+        $suratPath = null;
+        if ($request->hasFile('surat_permohonan')) {
+            $file = $request->file('surat_permohonan');
+            $filename = time() . '_' . $user->id . '_' . $file->getClientOriginalName();
+            $suratPath = $file->storeAs('surat_permohonan', $filename, 'public');
+        }
+
         // Create data_magang with status 'submitted' for HRD review
         \App\Models\DataMagang::create([
             'profil_peserta_id' => $profilPeserta->id,
+            'path_surat_permohonan' => $suratPath,
+            'tanggal_mulai' => $validated['tanggal_mulai'],
+            'tanggal_selesai' => $validated['tanggal_selesai'],
             'workflow_status' => 'submitted', // Initial status: waiting for HRD review
-            'tanggal_mulai' => null,
-            'tanggal_selesai' => null,
         ]);
 
         // DO NOT auto-login - user must wait for HRD approval
