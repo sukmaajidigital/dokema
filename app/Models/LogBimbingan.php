@@ -16,6 +16,7 @@ class LogBimbingan extends Model
         'waktu_bimbingan',
         'catatan_peserta',
         'catatan_pembimbing',
+        'path_dokumentasi',
     ];
 
     protected $casts = [

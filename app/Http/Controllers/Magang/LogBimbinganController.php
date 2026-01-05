@@ -44,15 +44,24 @@ class LogBimbinganController extends Controller
     {
         $user = Auth::user();
 
-        // Get list peserta for dropdown (pembimbing & hr only)
+        // Get list peserta for dropdown
         if ($user->role === 'pembimbing') {
             $dataMagang = DataMagang::where('pembimbing_id', $user->id)
                 ->with('profilPeserta')
                 ->get();
         } elseif ($user->role === 'hr') {
             $dataMagang = DataMagang::with('profilPeserta')->get();
+        } elseif ($user->role === 'magang') {
+            // Peserta magang hanya bisa create untuk diri sendiri
+            $profilPeserta = $user->profilPeserta;
+            if (!$profilPeserta) {
+                return redirect()->route('bimbingan.index')->with('error', 'Profil peserta tidak ditemukan');
+            }
+            $dataMagang = $profilPeserta->dataMagang;
+            if (!$dataMagang || $dataMagang->isEmpty()) {
+                return redirect()->route('bimbingan.index')->with('error', 'Data magang tidak ditemukan');
+            }
         } else {
-            // Magang tidak bisa create log bimbingan
             abort(403, 'Unauthorized');
         }
 
@@ -61,19 +70,41 @@ class LogBimbinganController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'data_magang_id' => 'required|exists:data_magang,id',
-            'waktu_bimbingan' => 'required|date',
-            'catatan_peserta' => 'nullable|string',
-            'catatan_pembimbing' => 'nullable|string',
-        ]);
-
-        // Verify user has access to this data_magang
         $user = Auth::user();
-        $dataMagang = DataMagang::findOrFail($data['data_magang_id']);
 
-        if ($user->role === 'pembimbing' && $dataMagang->pembimbing_id !== $user->id) {
-            abort(403, 'Unauthorized - Anda tidak membimbing peserta ini');
+        // Validation rules berbeda untuk magang vs pembimbing/hr
+        if ($user->role === 'magang') {
+            $data = $request->validate([
+                'data_magang_id' => 'required|exists:data_magang,id',
+                'waktu_bimbingan' => 'required|date',
+                'catatan_peserta' => 'required|string',
+                'path_dokumentasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:2048',
+            ]);
+
+            // Verify magang owns this data_magang
+            $dataMagang = DataMagang::findOrFail($data['data_magang_id']);
+            if ($dataMagang->profil_peserta_id !== $user->profilPeserta->id) {
+                abort(403, 'Unauthorized');
+            }
+        } else {
+            $data = $request->validate([
+                'data_magang_id' => 'required|exists:data_magang,id',
+                'waktu_bimbingan' => 'required|date',
+                'catatan_peserta' => 'nullable|string',
+                'catatan_pembimbing' => 'required|string',
+                'path_dokumentasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:2048',
+            ]);
+
+            // Verify pembimbing has access
+            $dataMagang = DataMagang::findOrFail($data['data_magang_id']);
+            if ($user->role === 'pembimbing' && $dataMagang->pembimbing_id !== $user->id) {
+                abort(403, 'Unauthorized - Anda tidak membimbing peserta ini');
+            }
+        }
+
+        // Handle file upload
+        if ($request->hasFile('path_dokumentasi')) {
+            $data['path_dokumentasi'] = $request->file('path_dokumentasi')->store('bimbingan/dokumentasi', 'public');
         }
 
         LogBimbingan::create($data);
@@ -86,17 +117,23 @@ class LogBimbinganController extends Controller
         $user = Auth::user();
 
         // Verify access
-        if ($user->role === 'pembimbing' && $log->dataMagang->pembimbing_id !== $user->id) {
-            abort(403, 'Unauthorized');
-        }
-
-        // Get list peserta for dropdown
-        if ($user->role === 'pembimbing') {
+        if ($user->role === 'magang') {
+            // Magang hanya bisa edit log milik sendiri
+            if ($log->dataMagang->profil_peserta_id !== $user->profilPeserta->id) {
+                abort(403, 'Unauthorized');
+            }
+            $dataMagang = collect([$log->dataMagang]);
+        } elseif ($user->role === 'pembimbing') {
+            if ($log->dataMagang->pembimbing_id !== $user->id) {
+                abort(403, 'Unauthorized');
+            }
             $dataMagang = DataMagang::where('pembimbing_id', $user->id)
                 ->with('profilPeserta')
                 ->get();
         } elseif ($user->role === 'hr') {
             $dataMagang = DataMagang::with('profilPeserta')->get();
+        } else {
+            abort(403, 'Unauthorized');
         }
 
         return view('magang.bimbingan.edit', compact('log', 'dataMagang'));
@@ -107,17 +144,38 @@ class LogBimbinganController extends Controller
         $log = LogBimbingan::findOrFail($id);
         $user = Auth::user();
 
-        // Verify access
-        if ($user->role === 'pembimbing' && $log->dataMagang->pembimbing_id !== $user->id) {
-            abort(403, 'Unauthorized');
+        // Verify access and validate based on role
+        if ($user->role === 'magang') {
+            // Magang hanya bisa edit log milik sendiri
+            if ($log->dataMagang->profil_peserta_id !== $user->profilPeserta->id) {
+                abort(403, 'Unauthorized');
+            }
+
+            $data = $request->validate([
+                'data_magang_id' => 'required|exists:data_magang,id',
+                'waktu_bimbingan' => 'required|date',
+                'catatan_peserta' => 'required|string',
+                'path_dokumentasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:2048',
+            ]);
+        } else {
+            // Verify pembimbing access
+            if ($user->role === 'pembimbing' && $log->dataMagang->pembimbing_id !== $user->id) {
+                abort(403, 'Unauthorized');
+            }
+
+            $data = $request->validate([
+                'data_magang_id' => 'required|exists:data_magang,id',
+                'waktu_bimbingan' => 'required|date',
+                'catatan_peserta' => 'nullable|string',
+                'catatan_pembimbing' => 'required|string',
+                'path_dokumentasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:2048',
+            ]);
         }
 
-        $data = $request->validate([
-            'data_magang_id' => 'required|exists:data_magang,id',
-            'waktu_bimbingan' => 'required|date',
-            'catatan_peserta' => 'nullable|string',
-            'catatan_pembimbing' => 'nullable|string',
-        ]);
+        // Handle file upload
+        if ($request->hasFile('path_dokumentasi')) {
+            $data['path_dokumentasi'] = $request->file('path_dokumentasi')->store('bimbingan/dokumentasi', 'public');
+        }
 
         $log->update($data);
         return redirect()->route('bimbingan.index')->with('success', 'Log bimbingan berhasil diupdate');

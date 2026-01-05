@@ -23,9 +23,7 @@
                 <x-admin.form-select name="data_magang_id" label="Pilih Data Magang" required="true" placeholder="Pilih data magang">
                     @foreach ($magangs as $magang)
                         <option value="{{ $magang->id }}" {{ old('data_magang_id', $logBimbingan->data_magang_id ?? '') == $magang->id ? 'selected' : '' }}>
-                            {{ $magang->profilPeserta->user->name ?? 'N/A' }} -
-                            {{ $magang->profilPeserta->nim }}
-                            ({{ $magang->departemen ?? 'Departemen tidak terdaftar' }})
+                            {{ $magang->profilPeserta->universitas ?? 'N/A' }} - {{ $magang->profilPeserta->nama_peserta ?? 'N/A' }} - {{ $magang->profilPeserta->nim ?? 'N/A' }}
                         </option>
                     @endforeach
                 </x-admin.form-select>
@@ -34,30 +32,36 @@
             <!-- Guidance Information -->
             <div class="bg-green-50 rounded-lg p-4">
                 <h4 class="text-sm font-medium text-gray-900 mb-4">Informasi Bimbingan</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <x-admin.form-input name="tanggal_bimbingan" label="Tanggal Bimbingan" type="date" :value="old('tanggal_bimbingan', $logBimbingan->tanggal_bimbingan ?? '')" required="true" />
-
-                    <x-admin.form-input name="waktu_bimbingan" label="Waktu Bimbingan" type="time" :value="old('waktu_bimbingan', $logBimbingan->waktu_bimbingan ?? '')" required="true" />
-                </div>
-
-                <div class="mt-6">
-                    <x-admin.form-input name="tempat_bimbingan" label="Tempat Bimbingan" type="text" :value="old('tempat_bimbingan', $logBimbingan->tempat_bimbingan ?? '')" placeholder="Masukkan lokasi bimbingan (ruangan, online, dll)" required="true" />
-                </div>
+                <x-admin.form-input name="waktu_bimbingan" label="Tanggal dan Waktu Bimbingan" type="datetime-local" :value="old('waktu_bimbingan', $logBimbingan->waktu_bimbingan ?? '')" required="true" />
             </div>
 
             <!-- Discussion Details -->
             <div class="bg-yellow-50 rounded-lg p-4">
-                <h4 class="text-sm font-medium text-gray-900 mb-4">Detail Pembahasan</h4>
+                <h4 class="text-sm font-medium text-gray-900 mb-4">Catatan Bimbingan</h4>
                 <div class="space-y-6">
-                    <x-admin.form-textarea name="materi_bimbingan" label="Materi yang Dibahas" :value="old('materi_bimbingan', $logBimbingan->materi_bimbingan ?? '')" placeholder="Jelaskan topik atau materi yang dibahas dalam sesi bimbingan ini..." rows="4" required="true" />
+                    @if (Auth::user()->role === 'magang')
+                        {{-- Peserta magang hanya bisa input catatan_peserta --}}
+                        <x-admin.form-textarea name="catatan_peserta" label="Catatan Peserta" :value="old('catatan_peserta', $logBimbingan->catatan_peserta ?? '')" placeholder="Catatan dari peserta magang terkait sesi bimbingan ini..." rows="6" required="true" />
 
-                    <x-admin.form-textarea name="progress_peserta" label="Progress Peserta" :value="old('progress_peserta', $logBimbingan->progress_peserta ?? '')" placeholder="Jelaskan perkembangan atau kemajuan peserta magang..." rows="3" />
+                        @if ($logBimbingan && $logBimbingan->catatan_pembimbing)
+                            {{-- Tampilkan catatan pembimbing (read-only) jika sudah ada --}}
+                            <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                                <label class="text-sm font-medium text-gray-700">Catatan Pembimbing</label>
+                                <p class="mt-2 text-sm text-gray-900 whitespace-pre-wrap">{{ $logBimbingan->catatan_pembimbing }}</p>
+                            </div>
+                        @endif
+                    @else
+                        {{-- Pembimbing/HR bisa input catatan_pembimbing --}}
+                        @if ($logBimbingan && $logBimbingan->catatan_peserta)
+                            {{-- Tampilkan catatan peserta (read-only) --}}
+                            <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                                <label class="text-sm font-medium text-gray-700">Catatan Peserta</label>
+                                <p class="mt-2 text-sm text-gray-900 whitespace-pre-wrap">{{ $logBimbingan->catatan_peserta }}</p>
+                            </div>
+                        @endif
 
-                    <x-admin.form-textarea name="kendala_dihadapi" label="Kendala yang Dihadapi" :value="old('kendala_dihadapi', $logBimbingan->kendala_dihadapi ?? '')" placeholder="Jelaskan kendala atau kesulitan yang dihadapi peserta (opsional)..." rows="3" />
-
-                    <x-admin.form-textarea name="saran_pembimbing" label="Saran dan Masukan Pembimbing" :value="old('saran_pembimbing', $logBimbingan->saran_pembimbing ?? '')" placeholder="Saran, masukan, atau arahan dari pembimbing..." rows="3" required="true" />
-
-                    <x-admin.form-textarea name="rencana_selanjutnya" label="Rencana Kegiatan Selanjutnya" :value="old('rencana_selanjutnya', $logBimbingan->rencana_selanjutnya ?? '')" placeholder="Rencana atau target untuk periode selanjutnya..." rows="3" />
+                        <x-admin.form-textarea name="catatan_pembimbing" label="Catatan Pembimbing" :value="old('catatan_pembimbing', $logBimbingan->catatan_pembimbing ?? '')" placeholder="Catatan, saran, dan arahan dari pembimbing..." rows="6" required="true" />
+                    @endif
                 </div>
             </div>
 
@@ -149,40 +153,6 @@
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
-            </div>
-
-            <!-- Status and Rating -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <x-admin.form-select name="status" label="Status Bimbingan" required="true" placeholder="Pilih status bimbingan">
-                    <option value="scheduled" {{ old('status', $logBimbingan->status ?? 'scheduled') === 'scheduled' ? 'selected' : '' }}>
-                        Terjadwal
-                    </option>
-                    <option value="completed" {{ old('status', $logBimbingan->status ?? '') === 'completed' ? 'selected' : '' }}>
-                        Selesai
-                    </option>
-                    <option value="cancelled" {{ old('status', $logBimbingan->status ?? '') === 'cancelled' ? 'selected' : '' }}>
-                        Dibatalkan
-                    </option>
-                </x-admin.form-select>
-
-                <x-admin.form-select name="rating_bimbingan" label="Rating Sesi Bimbingan" placeholder="Pilih rating (opsional)">
-                    <option value="">-- Pilih Rating --</option>
-                    <option value="5" {{ old('rating_bimbingan', $logBimbingan->rating_bimbingan ?? '') == '5' ? 'selected' : '' }}>
-                        ⭐⭐⭐⭐⭐ Sangat Baik
-                    </option>
-                    <option value="4" {{ old('rating_bimbingan', $logBimbingan->rating_bimbingan ?? '') == '4' ? 'selected' : '' }}>
-                        ⭐⭐⭐⭐ Baik
-                    </option>
-                    <option value="3" {{ old('rating_bimbingan', $logBimbingan->rating_bimbingan ?? '') == '3' ? 'selected' : '' }}>
-                        ⭐⭐⭐ Cukup
-                    </option>
-                    <option value="2" {{ old('rating_bimbingan', $logBimbingan->rating_bimbingan ?? '') == '2' ? 'selected' : '' }}>
-                        ⭐⭐ Kurang
-                    </option>
-                    <option value="1" {{ old('rating_bimbingan', $logBimbingan->rating_bimbingan ?? '') == '1' ? 'selected' : '' }}>
-                        ⭐ Sangat Kurang
-                    </option>
-                </x-admin.form-select>
             </div>
 
             @if ($logBimbingan)
