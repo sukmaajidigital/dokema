@@ -79,7 +79,7 @@ class LaporanKegiatanController extends Controller
         if ($user->role === 'magang') {
             $data = $request->validate([
                 'tanggal_laporan' => 'required|date',
-                'deskripsi' => 'required|string|min:20',
+                'deskripsi' => 'required|string|min:2',
                 'lampiran' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             ]);
 
@@ -167,7 +167,7 @@ class LaporanKegiatanController extends Controller
             // Magang cannot change data_magang_id
             $data = $request->validate([
                 'tanggal_laporan' => 'required|date',
-                'deskripsi' => 'required|string|min:20',
+                'deskripsi' => 'required|string|min:2',
                 'lampiran' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             ]);
             $data['data_magang_id'] = $dataMagang->id;
@@ -247,7 +247,7 @@ class LaporanKegiatanController extends Controller
         }
 
         $laporan->update([
-            'status_verifikasi' => 'verified',
+            'status_verifikasi' => 'disetujui',
             'verified_by' => Auth::id(),
             'verified_at' => now(),
         ]);
@@ -274,7 +274,7 @@ class LaporanKegiatanController extends Controller
         ]);
 
         $laporan->update([
-            'status_verifikasi' => 'rejected',
+            'status_verifikasi' => 'revisi',
             'verified_by' => Auth::id(),
             'verified_at' => now(),
             'catatan_verifikasi' => $request->catatan_verifikasi,

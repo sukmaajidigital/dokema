@@ -84,13 +84,7 @@
             <!-- Activity Details -->
             <div class="bg-yellow-50 rounded-lg p-4">
                 <h4 class="text-sm font-medium text-gray-900 mb-4">Detail Kegiatan</h4>
-                <div class="space-y-6">
-                    <x-admin.form-textarea name="kegiatan" label="Kegiatan yang Dilakukan" :value="old('kegiatan', $laporan->kegiatan ?? '')" placeholder="Jelaskan kegiatan yang telah dilakukan pada minggu ini..." rows="4" required="true" />
-
-                    <x-admin.form-textarea name="kendala" label="Kendala yang Dihadapi" :value="old('kendala', $laporan->kendala ?? '')" placeholder="Jelaskan kendala atau kesulitan yang dihadapi (opsional)..." rows="3" />
-
-                    <x-admin.form-textarea name="pencapaian" label="Pencapaian/Hasil" :value="old('pencapaian', $laporan->pencapaian ?? '')" placeholder="Jelaskan pencapaian atau hasil dari kegiatan yang dilakukan..." rows="3" required="true" />
-                </div>
+                <x-admin.form-textarea name="deskripsi" label="Deskripsi Kegiatan" :value="old('deskripsi', $laporan->deskripsi ?? '')" placeholder="Jelaskan secara lengkap kegiatan yang telah dilakukan, kendala yang dihadapi (jika ada), dan pencapaian/hasil dari kegiatan..." rows="8" required="true" />
             </div>
 
             <!-- File Upload -->
