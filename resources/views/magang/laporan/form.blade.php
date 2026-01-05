@@ -19,17 +19,50 @@
         <div class="px-6 py-4 space-y-6">
             <!-- Data Magang Selection -->
             <div class="bg-blue-50 rounded-lg p-4">
-                <h4 class="text-sm font-medium text-gray-900 mb-4">Informasi Magang</h4>
-                <x-admin.form-select name="data_magang_id" label="Pilih Data Magang" required="true" placeholder="Pilih data magang">
-                    @foreach ($magangs as $magang)
-                        <option value="{{ $magang->id }}" {{ old('data_magang_id', $laporan->data_magang_id ?? '') == $magang->id ? 'selected' : '' }}>
-                            {{ $magang->profilPeserta->user->name ?? 'N/A' }} -
-                            {{ $magang->profilPeserta->nim }}
-                            ({{ \Carbon\Carbon::parse($magang->tanggal_mulai)->format('d M Y') }} -
-                            {{ \Carbon\Carbon::parse($magang->tanggal_selesai)->format('d M Y') }})
-                        </option>
-                    @endforeach
-                </x-admin.form-select>
+                <h4 class="text-sm font-medium text-gray-900 mb-4">Informasi Peserta Magang</h4>
+
+                @if (count($magangs) === 1)
+                    {{-- Auto-select untuk peserta magang (tidak perlu dropdown) --}}
+                    @php $magang = $magangs->first(); @endphp
+                    <input type="hidden" name="data_magang_id" value="{{ $magang->id }}">
+
+                    <div class="bg-white rounded-lg border border-blue-200 p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <h5 class="text-sm font-semibold text-gray-900">{{ $magang->profilPeserta->user->name ?? 'N/A' }}</h5>
+                                <p class="text-sm text-gray-600 mt-1">NIM: {{ $magang->profilPeserta->nim }}</p>
+                                <p class="text-xs text-gray-500 mt-2">
+                                    <span class="inline-flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        {{ \Carbon\Carbon::parse($magang->tanggal_mulai)->format('d M Y') }} -
+                                        {{ \Carbon\Carbon::parse($magang->tanggal_selesai)->format('d M Y') }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    {{-- Dropdown untuk pembimbing/HR yang bisa pilih peserta --}}
+                    <x-admin.form-select name="data_magang_id" label="Pilih Data Magang" required="true" placeholder="Pilih data magang">
+                        @foreach ($magangs as $magang)
+                            <option value="{{ $magang->id }}" {{ old('data_magang_id', $laporan->data_magang_id ?? '') == $magang->id ? 'selected' : '' }}>
+                                {{ $magang->profilPeserta->user->name ?? 'N/A' }} -
+                                {{ $magang->profilPeserta->nim }}
+                                ({{ \Carbon\Carbon::parse($magang->tanggal_mulai)->format('d M Y') }} -
+                                {{ \Carbon\Carbon::parse($magang->tanggal_selesai)->format('d M Y') }})
+                            </option>
+                        @endforeach
+                    </x-admin.form-select>
+                @endif
             </div>
 
             <!-- Report Information -->
@@ -148,27 +181,29 @@
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+                <!-- Status -->
+                <div>
+                    <x-admin.form-select name="status" label="Status Laporan" required="true" placeholder="Pilih status laporan">
+                        <option value="draft" {{ old('status', $laporan->status ?? 'draft') === 'draft' ? 'selected' : '' }}>
+                            Draft
+                        </option>
+                        <option value="submitted" {{ old('status', $laporan->status ?? '') === 'submitted' ? 'selected' : '' }}>
+                            Submitted
+                        </option>
+
+                        @if (count($magangs) > 1)
+                            {{-- Status approved/rejected hanya untuk pembimbing/HR --}}
+                            <option value="approved" {{ old('status', $laporan->status ?? '') === 'approved' ? 'selected' : '' }}>
+                                Approved
+                            </option>
+                            <option value="rejected" {{ old('status', $laporan->status ?? '') === 'rejected' ? 'selected' : '' }}>
+                                Rejected
+                            </option>
+                        @endif
+                    </x-admin.form-select>
+                </div>
             </div>
-
         </div>
-</div>
-
-<!-- Status -->
-<div>
-    <x-admin.form-select name="status" label="Status Laporan" required="true" placeholder="Pilih status laporan">
-        <option value="draft" {{ old('status', $laporan->status ?? 'draft') === 'draft' ? 'selected' : '' }}>
-            Draft
-        </option>
-        <option value="submitted" {{ old('status', $laporan->status ?? '') === 'submitted' ? 'selected' : '' }}>
-            Submitted
-        </option>
-        <option value="approved" {{ old('status', $laporan->status ?? '') === 'approved' ? 'selected' : '' }}>
-            Approved
-        </option>
-        <option value="rejected" {{ old('status', $laporan->status ?? '') === 'rejected' ? 'selected' : '' }}>
-            Rejected
-        </option>
-    </x-admin.form-select>
 </div>
 
 @if ($laporan)
