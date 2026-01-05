@@ -21,10 +21,9 @@
                 <x-slot name="thead">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peserta</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pembimbing</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Periode</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departemen</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-sort">Dokumen</th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider no-sort">Aksi</th>
                     </tr>
                 </x-slot>
@@ -46,39 +45,31 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ $m->pembimbing ? $m->pembimbing->name : '-' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             <div class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($m->tanggal_mulai)->format('d M Y') }}</div>
                             <div class="text-sm text-gray-500">{{ \Carbon\Carbon::parse($m->tanggal_selesai)->format('d M Y') }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $m->departemen ?? '-' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
                                 @if ($m->status === 'diterima') bg-green-100 text-green-800
-                                @elseif($m->status === 'pending') bg-yellow-100 text-yellow-800
+                                @elseif($m->status === 'selesai') bg-blue-100 text-blue-800
+                                @elseif($m->status === 'menunggu') bg-yellow-100 text-yellow-800
                                 @elseif($m->status === 'ditolak') bg-red-100 text-red-800
                                 @else bg-gray-100 text-gray-800 @endif">
                                 {{ ucfirst($m->status) }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div class="flex space-x-2">
-                                @if ($m->path_surat_permohonan)
-                                    <a href="{{ asset('storage/' . $m->path_surat_permohonan) }}" target="_blank" class="text-blue-600 hover:text-blue-900" title="Surat Permohonan">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                    </a>
-                                @endif
-                                @if ($m->path_surat_balasan)
-                                    <a href="{{ asset('storage/' . $m->path_surat_balasan) }}" target="_blank" class="text-green-600 hover:text-green-900" title="Surat Balasan">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </a>
-                                @endif
-                            </div>
-                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex items-center justify-end space-x-2">
+                                <a href="{{ route('magang.show', $m->id) }}" class="inline-flex items-center px-2 py-1 bg-indigo-100 text-indigo-800 text-xs font-medium rounded hover:bg-indigo-200" title="Lihat Detail">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    View
+                                </a>
                                 <a href="{{ route('laporan.index', $m->id) }}" class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded" title="Laporan">
                                     Laporan
                                 </a>
@@ -110,7 +101,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">Belum ada data magang.</td>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada data magang.</td>
                     </tr>
                 @endforelse
             </x-admin.table>

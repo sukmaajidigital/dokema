@@ -408,7 +408,8 @@
     <!-- Signature Section -->
     <div class="signature-section">
         <div class="signature-box">
-            <p>{{ $penilaian->dataMagang->profilPeserta->universitas ?? 'Kota' }}, {{ \Carbon\Carbon::parse($penilaian->tanggal_penilaian)->format('d F Y') }}</p>
+            <p>Kudus, {{ \Carbon\Carbon::parse($penilaian->tanggal_penilaian)->format('d F Y') }}</p>
+            <p>PT. Telkom Akses Kudus</p>
             <p>Penyelia</p>
             <div class="signature-space"></div>
             <p class="underline bold">{{ $penilaian->penilai ? $penilaian->penilai->name : '-' }}</p>

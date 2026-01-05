@@ -54,11 +54,13 @@
                     <label class="text-sm font-medium text-gray-600">Status</label>
                     <p class="mt-1">
                         @if ($magang->status === 'diterima')
-                            <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Diterima</span>
+                            <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">Diterima</span>
+                        @elseif($magang->status === 'selesai')
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">Selesai</span>
                         @elseif($magang->status === 'ditolak')
-                            <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">Ditolak</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">Ditolak</span>
                         @else
-                            <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">Menunggu</span>
+                            <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">Menunggu</span>
                         @endif
                     </p>
                 </div>
@@ -89,29 +91,94 @@
 
         <!-- Dokumen -->
         <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Dokumen</h2>
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Dokumen Magang</h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Surat Permohonan -->
                 <div>
-                    <label class="text-sm font-medium text-gray-600">Surat Permohonan</label>
+                    <h3 class="text-sm font-medium text-gray-700 mb-3">Surat Permohonan</h3>
                     @if ($magang->path_surat_permohonan)
-                        <a href="{{ Storage::url($magang->path_surat_permohonan) }}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800 mt-1">
-                            <x-lucide-file-text class="w-5 h-5 mr-2" />
-                            Lihat Dokumen
-                        </a>
+                        <div class="border rounded-lg overflow-hidden bg-white shadow-sm">
+                            @php
+                                $ext = strtolower(pathinfo($magang->path_surat_permohonan, PATHINFO_EXTENSION));
+                                $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif']);
+                            @endphp
+                            @if ($isImage)
+                                <img src="{{ asset('storage/' . $magang->path_surat_permohonan) }}" alt="Surat Permohonan" class="w-full h-64 object-contain bg-gray-50">
+                            @else
+                                <div class="p-8 text-center bg-gray-50">
+                                    <svg class="mx-auto w-16 h-16 text-red-500 mb-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                    </svg>
+                                    <p class="text-sm font-medium text-gray-900 mb-1">Dokumen PDF</p>
+                                    <p class="text-xs text-gray-500">{{ basename($magang->path_surat_permohonan) }}</p>
+                                </div>
+                            @endif
+                            <div class="p-3 bg-gray-50 border-t flex justify-between items-center">
+                                <span class="text-xs text-gray-600 font-medium">Surat Permohonan</span>
+                                <div class="flex gap-2">
+                                    <a href="{{ asset('storage/' . $magang->path_surat_permohonan) }}" target="_blank" class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded hover:bg-blue-200 transition">
+                                        <x-lucide-eye class="w-3 h-3 mr-1" />
+                                        Lihat
+                                    </a>
+                                    <a href="{{ asset('storage/' . $magang->path_surat_permohonan) }}" download class="inline-flex items-center px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded hover:bg-green-200 transition">
+                                        <x-lucide-download class="w-3 h-3 mr-1" />
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     @else
-                        <p class="text-gray-500 mt-1">Belum diunggah</p>
+                        <div class="border rounded-lg p-6 text-center text-gray-500 bg-gray-50">
+                            <svg class="mx-auto w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <p class="text-sm">Belum ada dokumen</p>
+                        </div>
                     @endif
                 </div>
+
+                <!-- Surat Balasan -->
                 <div>
-                    <label class="text-sm font-medium text-gray-600">Surat Balasan</label>
+                    <h3 class="text-sm font-medium text-gray-700 mb-3">Surat Balasan</h3>
                     @if ($magang->path_surat_balasan)
-                        <a href="{{ Storage::url($magang->path_surat_balasan) }}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800 mt-1">
-                            <x-lucide-file-text class="w-5 h-5 mr-2" />
-                            Lihat Dokumen
-                        </a>
+                        <div class="border rounded-lg overflow-hidden bg-white shadow-sm">
+                            @php
+                                $ext = strtolower(pathinfo($magang->path_surat_balasan, PATHINFO_EXTENSION));
+                                $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif']);
+                            @endphp
+                            @if ($isImage)
+                                <img src="{{ asset('storage/' . $magang->path_surat_balasan) }}" alt="Surat Balasan" class="w-full h-64 object-contain bg-gray-50">
+                            @else
+                                <div class="p-8 text-center bg-gray-50">
+                                    <svg class="mx-auto w-16 h-16 text-red-500 mb-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                    </svg>
+                                    <p class="text-sm font-medium text-gray-900 mb-1">Dokumen PDF</p>
+                                    <p class="text-xs text-gray-500">{{ basename($magang->path_surat_balasan) }}</p>
+                                </div>
+                            @endif
+                            <div class="p-3 bg-gray-50 border-t flex justify-between items-center">
+                                <span class="text-xs text-gray-600 font-medium">Surat Balasan</span>
+                                <div class="flex gap-2">
+                                    <a href="{{ asset('storage/' . $magang->path_surat_balasan) }}" target="_blank" class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded hover:bg-blue-200 transition">
+                                        <x-lucide-eye class="w-3 h-3 mr-1" />
+                                        Lihat
+                                    </a>
+                                    <a href="{{ asset('storage/' . $magang->path_surat_balasan) }}" download class="inline-flex items-center px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded hover:bg-green-200 transition">
+                                        <x-lucide-download class="w-3 h-3 mr-1" />
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     @else
-                        <p class="text-gray-500 mt-1">Belum diunggah</p>
+                        <div class="border rounded-lg p-6 text-center text-gray-500 bg-gray-50">
+                            <svg class="mx-auto w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <p class="text-sm">Belum ada dokumen</p>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -239,46 +306,119 @@
             </div>
 
             @if ($magang->penilaianAkhir)
+                <!-- Summary Box -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 mb-6 border-2 border-blue-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Hasil Penilaian</h3>
+                            <div class="flex items-baseline gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-600">Rata-rata</p>
+                                    <p class="text-4xl font-bold text-blue-600">{{ number_format($magang->penilaianAkhir->rata_rata ?? 0, 2) }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Nilai Huruf</p>
+                                    <p class="text-4xl font-bold text-green-600">{{ $magang->penilaianAkhir->nilai_huruf ?? '-' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Keterangan</p>
+                                    <p class="text-lg font-semibold text-gray-800">{{ $magang->penilaianAkhir->keterangan ?? '-' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        @if (Auth::user()->role !== 'magang')
+                            <div class="flex gap-2">
+                                <a href="{{ route('penilaian.edit', $magang->penilaianAkhir->id) }}" class="inline-flex items-center px-3 py-2 bg-yellow-600 text-white text-sm font-medium rounded hover:bg-yellow-700 transition">
+                                    <x-lucide-edit class="w-4 h-4 mr-1" />
+                                    Edit
+                                </a>
+                                <a href="{{ route('penilaian.print', $magang->penilaianAkhir->id) }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition">
+                                    <x-lucide-printer class="w-4 h-4 mr-1" />
+                                    Print
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Detail Nilai Komponen -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white border rounded-lg p-4">
+                        <label class="text-xs font-medium text-gray-500 uppercase">Keputusan Pemberi</label>
+                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($magang->penilaianAkhir->nilai_keputusan_pemberi ?? 0, 2) }}</p>
+                    </div>
+                    <div class="bg-white border rounded-lg p-4">
+                        <label class="text-xs font-medium text-gray-500 uppercase">Disiplin</label>
+                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($magang->penilaianAkhir->nilai_disiplin ?? 0, 2) }}</p>
+                    </div>
+                    <div class="bg-white border rounded-lg p-4">
+                        <label class="text-xs font-medium text-gray-500 uppercase">Prioritas</label>
+                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($magang->penilaianAkhir->nilai_prioritas ?? 0, 2) }}</p>
+                    </div>
+                    <div class="bg-white border rounded-lg p-4">
+                        <label class="text-xs font-medium text-gray-500 uppercase">Tepat Waktu</label>
+                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($magang->penilaianAkhir->nilai_tepat_waktu ?? 0, 2) }}</p>
+                    </div>
+                    <div class="bg-white border rounded-lg p-4">
+                        <label class="text-xs font-medium text-gray-500 uppercase">Bekerja Sama</label>
+                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($magang->penilaianAkhir->nilai_bekerja_sama ?? 0, 2) }}</p>
+                    </div>
+                    <div class="bg-white border rounded-lg p-4">
+                        <label class="text-xs font-medium text-gray-500 uppercase">Bekerja Mandiri</label>
+                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($magang->penilaianAkhir->nilai_bekerja_mandiri ?? 0, 2) }}</p>
+                    </div>
+                    <div class="bg-white border rounded-lg p-4">
+                        <label class="text-xs font-medium text-gray-500 uppercase">Ketelitian</label>
+                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($magang->penilaianAkhir->nilai_ketelitian ?? 0, 2) }}</p>
+                    </div>
+                    <div class="bg-white border rounded-lg p-4">
+                        <label class="text-xs font-medium text-gray-500 uppercase">Belajar & Menyerap</label>
+                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($magang->penilaianAkhir->nilai_belajar_menyerap ?? 0, 2) }}</p>
+                    </div>
+                    <div class="bg-white border rounded-lg p-4">
+                        <label class="text-xs font-medium text-gray-500 uppercase">Analisa & Merancang</label>
+                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($magang->penilaianAkhir->nilai_analisa_merancang ?? 0, 2) }}</p>
+                    </div>
+                </div>
+
+                <!-- Jumlah Total -->
+                <div class="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 mb-6">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-semibold text-gray-700 uppercase">Total Nilai (9 Komponen)</span>
+                        <span class="text-3xl font-bold text-gray-900">{{ number_format($magang->penilaianAkhir->jumlah_nilai ?? 0, 2) }}</span>
+                    </div>
+                </div>
+
+                <!-- Umpan Balik & Informasi Tambahan -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-sm font-medium text-gray-600">Nilai Kehadiran</label>
-                        <p class="text-gray-900 mt-1 text-2xl font-semibold">{{ $magang->penilaianAkhir->nilai_kehadiran ?? '-' }}</p>
+                    <div class="md:col-span-2 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <label class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                            <x-lucide-message-square class="w-4 h-4 mr-2 text-yellow-600" />
+                            Umpan Balik Pembimbing
+                        </label>
+                        <p class="text-gray-900">{{ $magang->penilaianAkhir->umpan_balik ?? 'Tidak ada umpan balik' }}</p>
                     </div>
+
                     <div>
-                        <label class="text-sm font-medium text-gray-600">Nilai Kedisiplinan</label>
-                        <p class="text-gray-900 mt-1 text-2xl font-semibold">{{ $magang->penilaianAkhir->nilai_kedisiplinan ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="text-sm font-medium text-gray-600">Nilai Keterampilan</label>
-                        <p class="text-gray-900 mt-1 text-2xl font-semibold">{{ $magang->penilaianAkhir->nilai_keterampilan ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="text-sm font-medium text-gray-600">Nilai Sikap</label>
-                        <p class="text-gray-900 mt-1 text-2xl font-semibold">{{ $magang->penilaianAkhir->nilai_sikap ?? '-' }}</p>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="text-sm font-medium text-gray-600">Nilai Rata-rata</label>
-                        <p class="text-gray-900 mt-1 text-3xl font-bold text-blue-600">
-                            {{ number_format($magang->penilaianAkhir->nilai_rata_rata ?? 0, 2) }}
+                        <label class="text-sm font-medium text-gray-600">Tanggal Penilaian</label>
+                        <p class="text-gray-900 mt-1">
+                            {{ $magang->penilaianAkhir->tanggal_penilaian ? \Carbon\Carbon::parse($magang->penilaianAkhir->tanggal_penilaian)->format('d F Y') : '-' }}
                         </p>
                     </div>
-                    <div class="md:col-span-2">
-                        <label class="text-sm font-medium text-gray-600">Umpan Balik</label>
-                        <p class="text-gray-900 mt-1">{{ $magang->penilaianAkhir->umpan_balik ?? '-' }}</p>
+
+                    <div>
+                        <label class="text-sm font-medium text-gray-600">Dinilai Oleh</label>
+                        <p class="text-gray-900 mt-1">
+                            {{ $magang->penilaianAkhir->penilai->name ?? ($magang->pembimbing->name ?? '-') }}
+                        </p>
                     </div>
+
                     @if ($magang->penilaianAkhir->path_surat_nilai)
                         <div class="md:col-span-2">
-                            <label class="text-sm font-medium text-gray-600">Surat Nilai</label>
-                            <a href="{{ Storage::url($magang->penilaianAkhir->path_surat_nilai) }}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800 mt-1">
+                            <label class="text-sm font-medium text-gray-600 mb-2 block">Surat Nilai</label>
+                            <a href="{{ Storage::url($magang->penilaianAkhir->path_surat_nilai) }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">
                                 <x-lucide-file-text class="w-5 h-5 mr-2" />
                                 Download Surat Nilai
-                            </a>
-                        </div>
-                    @endif
-                    @if (Auth::user()->role !== 'magang')
-                        <div class="md:col-span-2">
-                            <a href="{{ route('penilaian.edit', $magang->penilaianAkhir->id) }}" class="text-blue-600 hover:text-blue-800">
-                                Edit Penilaian
                             </a>
                         </div>
                     @endif

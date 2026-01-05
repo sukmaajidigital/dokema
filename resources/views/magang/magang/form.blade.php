@@ -39,15 +39,22 @@
                 </div>
             </div>
 
-            <!-- Assignment Information -->
-            <div class="bg-yellow-50 rounded-lg p-4">
-                <h4 class="text-sm font-medium text-gray-900 mb-4">Penempatan</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <x-admin.form-input name="departemen" label="Departemen" type="text" :value="old('departemen', $magang->departemen ?? '')" placeholder="Nama departemen" />
-
-                    <x-admin.form-input name="pembimbing" label="Nama Pembimbing" type="text" :value="old('pembimbing', $magang->pembimbing ?? '')" placeholder="Nama pembimbing" />
+            <!-- Pembimbing Info (Display Only if exists) -->
+            @if (isset($magang) && $magang && $magang->pembimbing)
+                <div class="bg-purple-50 rounded-lg p-4">
+                    <h4 class="text-sm font-medium text-gray-900 mb-4">Informasi Pembimbing</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-600">Nama Pembimbing</p>
+                            <p class="text-base font-medium text-gray-900">{{ $magang->pembimbing->name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Email Pembimbing</p>
+                            <p class="text-base font-medium text-gray-900">{{ $magang->pembimbing->email }}</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            @endif
 
             <!-- Documents -->
             <div class="bg-gray-50 rounded-lg p-4">
@@ -211,14 +218,17 @@
 <!-- Status -->
 <div>
     <x-admin.form-select name="status" label="Status Magang" required="true" placeholder="Pilih status magang">
-        <option value="pending" {{ old('status', $magang->status ?? '') === 'pending' ? 'selected' : '' }}>
-            Pending
+        <option value="menunggu" {{ old('status', $magang->status ?? '') === 'menunggu' ? 'selected' : '' }}>
+            Menunggu
         </option>
         <option value="diterima" {{ old('status', $magang->status ?? '') === 'diterima' ? 'selected' : '' }}>
             Diterima
         </option>
         <option value="ditolak" {{ old('status', $magang->status ?? '') === 'ditolak' ? 'selected' : '' }}>
             Ditolak
+        </option>
+        <option value="selesai" {{ old('status', $magang->status ?? '') === 'selesai' ? 'selected' : '' }}>
+            Selesai
         </option>
     </x-admin.form-select>
 </div>

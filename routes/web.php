@@ -63,6 +63,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/magang', [DataMagangController::class, 'index'])->name('magang.index');
     Route::get('/magang/create', [DataMagangController::class, 'create'])->name('magang.create');
     Route::post('/magang', [DataMagangController::class, 'store'])->name('magang.store');
+    Route::get('/magang/{id}', [DataMagangController::class, 'show'])->name('magang.show');
     Route::get('/magang/{id}/edit', [DataMagangController::class, 'edit'])->name('magang.edit');
     Route::put('/magang/{id}', [DataMagangController::class, 'update'])->name('magang.update');
     Route::delete('/magang/{id}', [DataMagangController::class, 'destroy'])->name('magang.destroy');
