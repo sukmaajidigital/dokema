@@ -48,7 +48,10 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/user/{user}', [UserController::class, 'update'])->name('user.update');
     Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('user.destroy');
 
-    // Profil Peserta
+    // My Profile - Personal profile for logged-in user (all roles)
+    Route::get('/my-profile', [ProfilPesertaController::class, 'myProfile'])->name('profil.my-profile');
+
+    // Profil Peserta Management (HR & Pembimbing only)
     Route::get('/profil', [ProfilPesertaController::class, 'index'])->name('profil.index');
     Route::get('/profil/create', [ProfilPesertaController::class, 'create'])->name('profil.create');
     Route::post('/profil', [ProfilPesertaController::class, 'store'])->name('profil.store');

@@ -182,4 +182,21 @@ class ProfilPesertaController extends Controller
         $profil->delete();
         return redirect()->route('profil.index')->with('success', 'Profil berhasil dihapus');
     }
+
+    /**
+     * Tampilkan profil detail user yang sedang login
+     */
+    public function myProfile()
+    {
+        $user = Auth::user();
+        $profil = $user->profilPeserta;
+
+        // Jika user memiliki profil peserta, ambil data magang terkait
+        $dataMagang = null;
+        if ($profil) {
+            $dataMagang = $profil->dataMagang()->with('pembimbing.user')->first();
+        }
+
+        return view('magang.profil.my-profile', compact('user', 'profil', 'dataMagang'));
+    }
 }

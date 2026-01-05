@@ -90,11 +90,6 @@
             'icon' => 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z M8 5a2 2 0 012-2h4a2 2 0 012 2v0a2 2 0 01-2 2H10a2 2 0 01-2-2v0z',
         ],
         [
-            'route' => 'profil.index',
-            'label' => 'Profil Saya',
-            'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-        ],
-        [
             'route' => 'laporan.index',
             'label' => 'Laporan Harian',
             'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
@@ -166,7 +161,7 @@
             <div x-show="open" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" @click.away="open = false" class="mt-2 mx-3 bg-blue-800 rounded-lg shadow-lg py-2">
 
                 <!-- Profil Saya -->
-                <a href="{{ route('profil.index') }}" class="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-blue-700 hover:text-white transition-colors duration-150" @click="sidebarOpen = false">
+                <a href="{{ route('profil.my-profile') }}" class="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-blue-700 hover:text-white transition-colors duration-150" @click="sidebarOpen = false">
                     <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                     </svg>
