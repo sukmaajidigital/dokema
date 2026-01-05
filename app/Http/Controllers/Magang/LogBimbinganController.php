@@ -16,16 +16,23 @@ class LogBimbinganController extends Controller
 
         if ($user->role === 'hr') {
             // HR: Lihat semua log bimbingan
-            $log = LogBimbingan::with(['dataMagang.profilPeserta'])->orderBy('waktu_bimbingan', 'desc')->get();
+            $log = LogBimbingan::with(['dataMagang.profilPeserta.user'])->orderBy('waktu_bimbingan', 'desc')->get();
         } elseif ($user->role === 'pembimbing') {
             // Pembimbing: Lihat log bimbingan untuk peserta yang dibimbing
             $log = LogBimbingan::whereHas('dataMagang', function ($query) use ($user) {
                 $query->where('pembimbing_id', $user->id);
-            })->with(['dataMagang.profilPeserta'])->orderBy('waktu_bimbingan', 'desc')->get();
+            })->with(['dataMagang.profilPeserta.user'])->orderBy('waktu_bimbingan', 'desc')->get();
         } elseif ($user->role === 'magang') {
             // Magang: Lihat log bimbingan sendiri
-            $dataMagang = $user->profilPeserta->dataMagang()->first();
-            $log = $dataMagang ? $dataMagang->logBimbingan()->orderBy('waktu_bimbingan', 'desc')->get() : collect();
+            $profilPeserta = $user->profilPeserta;
+            if (!$profilPeserta) {
+                return view('magang.bimbingan.index', ['log' => collect()]);
+            }
+
+            $dataMagang = $profilPeserta->dataMagang()->first();
+            $log = $dataMagang
+                ? $dataMagang->logBimbingan()->with(['dataMagang.profilPeserta.user'])->orderBy('waktu_bimbingan', 'desc')->get()
+                : collect();
         } else {
             $log = collect();
         }
