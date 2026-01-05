@@ -17,20 +17,24 @@ class LaporanKegiatanController extends Controller
             // Peserta hanya bisa lihat laporan milik sendiri
             $profilPeserta = Auth::user()->profilPeserta;
             if (!$profilPeserta) {
-                return view('magang.laporan.index', ['laporan' => []]);
+                return view('magang.laporan.index', ['laporan' => collect()]);
             }
 
             // dataMagang is hasMany, so get first record
             $dataMagang = $profilPeserta->dataMagang()->first();
             if (!$dataMagang) {
-                return view('magang.laporan.index', ['laporan' => []]);
+                return view('magang.laporan.index', ['laporan' => collect()]);
             }
             $laporan = $dataMagang->laporanKegiatan()->latest()->paginate(10);
         } elseif (Auth::user()->role === 'pembimbing') {
             // Pembimbing hanya bisa lihat laporan dari peserta yang dibimbing
+            $magangDibimbing = Auth::user()->magangDibimbing;
+            if ($magangDibimbing->isEmpty()) {
+                return view('magang.laporan.index', ['laporan' => collect()]);
+            }
             $laporan = LaporanKegiatan::whereIn(
                 'data_magang_id',
-                Auth::user()->magangDibimbing->pluck('id')
+                $magangDibimbing->pluck('id')
             )->latest()->paginate(10);
         } else {
             // HR bisa lihat semua laporan
