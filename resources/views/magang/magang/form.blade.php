@@ -1,7 +1,7 @@
 @props(['magang' => null, 'action', 'method' => 'POST', 'profils' => []])
 
 <div class="bg-white rounded-lg shadow">
-    <form action="{{ $action }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <form action="{{ $action }}" method="POST" enctype="multipart/form-data" x-data="documentPreview()">
         @csrf
         @if ($method === 'PUT')
             @method('PUT')
@@ -16,488 +16,364 @@
             </p>
         </div>
 
-        <div class="px-6 py-4 space-y-6">
-            <!-- Peserta Selection -->
-            <div class="bg-blue-50 rounded-lg p-4">
-                <h4 class="text-sm font-medium text-gray-900 mb-4">Informasi Peserta</h4>
-                <x-admin.form-select name="profil_peserta_id" label="Pilih Peserta Magang" required="true" placeholder="Pilih profil peserta">
-                    @foreach ($profils as $profil)
-                        <option value="{{ $profil->id }}" {{ old('profil_peserta_id', $magang->profil_peserta_id ?? '') == $profil->id ? 'selected' : '' }}>
-                            {{ $profil->user->name ?? 'N/A' }} - {{ $profil->nim }} ({{ $profil->universitas }})
-                        </option>
-                    @endforeach
-                </x-admin.form-select>
-            </div>
+        <div class="px-6 py-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Left Column: Data Peserta & Periode -->
+                <div class="space-y-4">
+                    <h4 class="text-sm font-semibold text-gray-900 border-b pb-2 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        Data Peserta Magang
+                    </h4>
 
-            <!-- Period Information -->
-            <div class="bg-green-50 rounded-lg p-4">
-                <h4 class="text-sm font-medium text-gray-900 mb-4">Periode Magang</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <x-admin.form-input name="tanggal_mulai" label="Tanggal Mulai" type="date" :value="old('tanggal_mulai', $magang->tanggal_mulai ?? '')" required="true" />
-
-                    <x-admin.form-input name="tanggal_selesai" label="Tanggal Selesai" type="date" :value="old('tanggal_selesai', $magang->tanggal_selesai ?? '')" required="true" />
-                </div>
-            </div>
-
-            <!-- Pembimbing Info (Display Only if exists) -->
-            @if (isset($magang) && $magang && $magang->pembimbing)
-                <div class="bg-purple-50 rounded-lg p-4">
-                    <h4 class="text-sm font-medium text-gray-900 mb-4">Informasi Pembimbing</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <p class="text-sm text-gray-600">Nama Pembimbing</p>
-                            <p class="text-base font-medium text-gray-900">{{ $magang->pembimbing->name }}</p>
+                    @if ($magang)
+                        <!-- Edit Mode: Display Only -->
+                        <div class="bg-blue-50 rounded-lg p-4 space-y-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 uppercase">Nama Peserta</label>
+                                <p class="mt-1 text-sm font-semibold text-gray-900">{{ $magang->profilPeserta->nama_peserta ?? '-' }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 uppercase">Email</label>
+                                <p class="mt-1 text-sm font-semibold text-gray-900">{{ $magang->profilPeserta->user->email ?? '-' }}</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 uppercase">NIM/NISN</label>
+                                    <p class="mt-1 text-sm font-semibold text-gray-900">{{ $magang->profilPeserta->nim ?? '-' }}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 uppercase">No. HP</label>
+                                    <p class="mt-1 text-sm font-semibold text-gray-900">{{ $magang->profilPeserta->no_hp ?? '-' }}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 uppercase">Universitas</label>
+                                <p class="mt-1 text-sm font-semibold text-gray-900">{{ $magang->profilPeserta->universitas ?? '-' }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 uppercase">Jurusan</label>
+                                <p class="mt-1 text-sm font-semibold text-gray-900">{{ $magang->profilPeserta->jurusan ?? '-' }}</p>
+                            </div>
+                            <input type="hidden" name="profil_peserta_id" value="{{ $magang->profil_peserta_id }}">
+                            <p class="text-xs text-gray-500 italic pt-2 border-t">
+                                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Data peserta tidak dapat diubah saat edit
+                            </p>
                         </div>
+                    @else
+                        <!-- Create Mode: Select Peserta -->
                         <div>
-                            <p class="text-sm text-gray-600">Email Pembimbing</p>
-                            <p class="text-base font-medium text-gray-900">{{ $magang->pembimbing->email }}</p>
+                            <label for="profil_peserta_id" class="block text-sm font-medium text-gray-700 mb-1">
+                                Pilih Peserta
+                            </label>
+                            <select id="profil_peserta_id" name="profil_peserta_id" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="">-- Pilih Peserta --</option>
+                                @foreach ($profils as $profil)
+                                    <option value="{{ $profil->id }}" {{ old('profil_peserta_id') == $profil->id ? 'selected' : '' }}>
+                                        {{ $profil->nama_peserta ?? ($profil->user->name ?? 'N/A') }} - {{ $profil->nim }} ({{ $profil->universitas }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('profil_peserta_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                            <p class="mt-1 text-xs text-gray-500">Pilih peserta yang sudah terdaftar di sistem</p>
+                        </div>
+                    @endif
+
+                    <!-- Periode Magang -->
+                    <div class="pt-2">
+                        <h5 class="text-sm font-semibold text-gray-900 mb-3">Periode Magang</h5>
+                        <div class="space-y-3">
+                            <div>
+                                <label for="tanggal_mulai" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Tanggal Mulai <span class="text-red-600">*</span>
+                                </label>
+                                <input type="date" id="tanggal_mulai" name="tanggal_mulai" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value="{{ old('tanggal_mulai', $magang->tanggal_mulai ?? '') }}">
+                                @error('tanggal_mulai')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="tanggal_selesai" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Tanggal Selesai <span class="text-red-600">*</span>
+                                </label>
+                                <input type="date" id="tanggal_selesai" name="tanggal_selesai" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value="{{ old('tanggal_selesai', $magang->tanggal_selesai ?? '') }}">
+                                @error('tanggal_selesai')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Status -->
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700 mb-1">
+                            Status <span class="text-red-600">*</span>
+                        </label>
+                        <select id="status" name="status" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <option value="menunggu" {{ old('status', $magang->status ?? '') === 'menunggu' ? 'selected' : '' }}>Menunggu</option>
+                            <option value="diterima" {{ old('status', $magang->status ?? '') === 'diterima' ? 'selected' : '' }}>Diterima</option>
+                            <option value="ditolak" {{ old('status', $magang->status ?? '') === 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                            <option value="selesai" {{ old('status', $magang->status ?? '') === 'selesai' ? 'selected' : '' }}>Selesai</option>
+                        </select>
+                        @error('status')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Pembimbing (Only for HR) -->
+                    @if (Auth::user()->role === 'hr')
+                        <div>
+                            <label for="pembimbing_id" class="block text-sm font-medium text-gray-700 mb-1">
+                                Pembimbing <span class="text-gray-500">(Opsional)</span>
+                            </label>
+                            <select id="pembimbing_id" name="pembimbing_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="">-- Belum Ditentukan --</option>
+                                @foreach (\App\Models\User::where('role', 'pembimbing')->get() as $pembimbing)
+                                    <option value="{{ $pembimbing->id }}" {{ old('pembimbing_id', $magang->pembimbing_id ?? '') == $pembimbing->id ? 'selected' : '' }}>
+                                        {{ $pembimbing->name }} ({{ $pembimbing->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('pembimbing_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @elseif($magang && $magang->pembimbing)
+                        <div class="bg-purple-50 rounded-lg p-4">
+                            <label class="block text-xs font-medium text-gray-600 uppercase mb-2">Pembimbing</label>
+                            <p class="text-sm font-semibold text-gray-900">{{ $magang->pembimbing->name }}</p>
+                            <p class="text-xs text-gray-600 mt-1">{{ $magang->pembimbing->email }}</p>
+                        </div>
+                    @endif
                 </div>
-            @endif
 
-            <!-- Documents -->
-            <div class="bg-gray-50 rounded-lg p-4">
-                <h4 class="text-sm font-medium text-gray-900 mb-4">Dokumen</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Surat Permohonan with Enhanced Preview -->
-                    <div x-data="enhancedFilePreview()" class="space-y-3">
-                        <x-input-label for="path_surat_permohonan" value="Surat Permohonan" />
-                        <div class="relative">
-                            <input type="file" name="path_surat_permohonan" id="path_surat_permohonan" @change="handleFileSelect($event)" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" accept=".pdf,.jpg,.jpeg,.png">
-                        </div>
+                <!-- Right Column: Dokumen -->
+                <div class="space-y-4">
+                    <h4 class="text-sm font-semibold text-gray-900 border-b pb-2 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Dokumen Magang
+                    </h4>
 
-                        <!-- Enhanced Preview Area -->
-                        <div x-show="fileUrl || existingFile" class="mt-3">
-                            <!-- New File Preview -->
-                            <template x-if="fileUrl">
-                                <div class="border rounded-lg p-3 bg-white cursor-pointer hover:shadow-md transition-shadow" @click="openModal()">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-sm font-medium text-gray-700">Preview File Baru (Klik untuk perbesar):</span>
-                                        <button type="button" @click.stop="clearFile()" class="text-red-500 hover:text-red-700 text-xs px-2 py-1 rounded hover:bg-red-50">
-                                            Hapus
-                                        </button>
-                                    </div>
-                                    <template x-if="fileType === 'image'">
-                                        <div class="relative">
-                                            <img :src="fileUrl" class="max-h-32 w-full object-contain rounded border hover:opacity-80 transition-opacity" alt="Preview">
-                                            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black bg-opacity-30 rounded transition-opacity">
-                                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </template>
-                                    <template x-if="fileType === 'pdf'">
-                                        <div class="flex items-center space-x-2 p-3 bg-red-50 rounded hover:bg-red-100 transition-colors">
-                                            <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M4 18h12V6l-4-4H4v16zm8-14v4h4l-4-4z" />
-                                            </svg>
-                                            <div class="flex-1">
-                                                <span class="text-sm text-gray-700 font-medium" x-text="fileName"></span>
-                                                <p class="text-xs text-gray-500">PDF - Klik untuk preview</p>
-                                            </div>
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                                            </svg>
-                                        </div>
-                                    </template>
-                                </div>
-                            </template>
+                    <p class="text-xs text-gray-500 bg-yellow-50 p-2 rounded">
+                        <strong>Format:</strong> PDF, JPG, PNG | <strong>Maksimal:</strong> 2MB per file
+                    </p>
 
-                            <!-- Existing File -->
-                            @if (isset($magang) && $magang && $magang->path_surat_permohonan)
-                                <template x-if="!fileUrl">
-                                    <div class="border rounded-lg p-3 bg-blue-50 cursor-pointer hover:shadow-md transition-shadow" @click="openExistingFile('{{ asset('storage/' . $magang->path_surat_permohonan) }}', '{{ pathinfo($magang->path_surat_permohonan, PATHINFO_EXTENSION) }}')">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center space-x-2">
-                                                <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M4 18h12V6l-4-4H4v16zm8-14v4h4l-4-4z" />
-                                                </svg>
-                                                <div>
-                                                    <span class="text-sm font-medium text-gray-700">File saat ini</span>
-                                                    <p class="text-xs text-gray-500">Klik untuk preview</p>
-                                                </div>
-                                            </div>
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </template>
-                            @endif
-                        </div>
-
+                    <!-- Surat Permohonan -->
+                    <div>
+                        <label for="path_surat_permohonan" class="block text-sm font-medium text-gray-700 mb-1">
+                            Surat Permohonan {{ $magang ? '' : '<span class="text-red-600">*</span>' }}
+                        </label>
+                        <input type="file" id="path_surat_permohonan" name="path_surat_permohonan" {{ $magang ? '' : 'required' }} accept=".pdf,.jpg,.jpeg,.png" @change="previewFile($event, 'permohonan')" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-l-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                         @error('path_surat_permohonan')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
-                    </div>
 
-                    <!-- Surat Balasan with Enhanced Preview -->
-                    <div x-data="enhancedFilePreview()" class="space-y-3">
-                        <x-input-label for="path_surat_balasan" value="Surat Balasan" />
-                        <div class="relative">
-                            <input type="file" name="path_surat_balasan" id="path_surat_balasan" @change="handleFileSelect($event)" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" accept=".pdf,.jpg,.jpeg,.png">
-                        </div>
-
-                        <!-- Enhanced Preview Area -->
-                        <div x-show="fileUrl || existingFile" class="mt-3">
-                            <!-- New File Preview -->
-                            <template x-if="fileUrl">
-                                <div class="border rounded-lg p-3 bg-white cursor-pointer hover:shadow-md transition-shadow" @click="openModal()">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-sm font-medium text-gray-700">Preview File Baru (Klik untuk perbesar):</span>
-                                        <button type="button" @click.stop="clearFile()" class="text-red-500 hover:text-red-700 text-xs px-2 py-1 rounded hover:bg-red-50">
-                                            Hapus
-                                        </button>
+                        <!-- Preview Surat Permohonan -->
+                        @if ($magang && $magang->path_surat_permohonan)
+                            <div class="mt-3 border rounded-lg p-3 bg-blue-50">
+                                <p class="text-xs font-medium text-gray-700 mb-2">File Saat Ini:</p>
+                                @php
+                                    $ext = strtolower(pathinfo($magang->path_surat_permohonan, PATHINFO_EXTENSION));
+                                    $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif']);
+                                @endphp
+                                @if ($isImage)
+                                    <img src="{{ asset('storage/' . $magang->path_surat_permohonan) }}" alt="Surat Permohonan" class="w-full h-32 object-contain rounded bg-white mb-2">
+                                @else
+                                    <div class="flex items-center p-3 bg-white rounded">
+                                        <svg class="w-8 h-8 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 18h12V6l-4-4H4v16zm8-14v4h4l-4-4z" />
+                                        </svg>
+                                        <span class="text-sm text-gray-700">{{ basename($magang->path_surat_permohonan) }}</span>
                                     </div>
-                                    <template x-if="fileType === 'image'">
-                                        <div class="relative">
-                                            <img :src="fileUrl" class="max-h-32 w-full object-contain rounded border hover:opacity-80 transition-opacity" alt="Preview">
-                                            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black bg-opacity-30 rounded transition-opacity">
-                                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </template>
-                                    <template x-if="fileType === 'pdf'">
-                                        <div class="flex items-center space-x-2 p-3 bg-red-50 rounded hover:bg-red-100 transition-colors">
-                                            <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M4 18h12V6l-4-4H4v16zm8-14v4h4l-4-4z" />
-                                            </svg>
-                                            <div class="flex-1">
-                                                <span class="text-sm text-gray-700 font-medium" x-text="fileName"></span>
-                                                <p class="text-xs text-gray-500">PDF - Klik untuk preview</p>
-                                            </div>
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                                            </svg>
-                                        </div>
-                                    </template>
+                                @endif
+                                <div class="flex gap-2 mt-2">
+                                    <a href="{{ asset('storage/' . $magang->path_surat_permohonan) }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800">Lihat</a>
+                                    <a href="{{ asset('storage/' . $magang->path_surat_permohonan) }}" download class="text-xs text-green-600 hover:text-green-800">Download</a>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2 italic">Upload file baru untuk mengganti</p>
+                            </div>
+                        @endif
+
+                        <!-- New File Preview -->
+                        <div x-show="previews.permohonan.url" x-cloak class="mt-3 border rounded-lg p-3 bg-green-50">
+                            <div class="flex justify-between items-center mb-2">
+                                <p class="text-xs font-medium text-gray-700">Preview File Baru:</p>
+                                <button type="button" @click="clearPreview('permohonan')" class="text-xs text-red-600 hover:text-red-800">Hapus</button>
+                            </div>
+                            <template x-if="previews.permohonan.type === 'image'">
+                                <img :src="previews.permohonan.url" class="w-full h-32 object-contain rounded bg-white">
+                            </template>
+                            <template x-if="previews.permohonan.type === 'pdf'">
+                                <div class="flex items-center p-3 bg-white rounded">
+                                    <svg class="w-8 h-8 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M4 18h12V6l-4-4H4v16zm8-14v4h4l-4-4z" />
+                                    </svg>
+                                    <span class="text-sm text-gray-700" x-text="previews.permohonan.name"></span>
                                 </div>
                             </template>
-
-                            <!-- Existing File -->
-                            @if (isset($magang) && $magang && $magang->path_surat_balasan)
-                                <template x-if="!fileUrl">
-                                    <div class="border rounded-lg p-3 bg-blue-50 cursor-pointer hover:shadow-md transition-shadow" @click="openExistingFile('{{ asset('storage/' . $magang->path_surat_balasan) }}', '{{ pathinfo($magang->path_surat_balasan, PATHINFO_EXTENSION) }}')">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center space-x-2">
-                                                <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M4 18h12V6l-4-4H4v16zm8-14v4h4l-4-4z" />
-                                                </svg>
-                                                <div>
-                                                    <span class="text-sm font-medium text-gray-700">File saat ini</span>
-                                                    <p class="text-xs text-gray-500">Klik untuk preview</p>
-                                                </div>
-                                            </div>
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </template>
-                            @endif
                         </div>
+                    </div>
 
+                    <!-- Surat Balasan -->
+                    <div>
+                        <label for="path_surat_balasan" class="block text-sm font-medium text-gray-700 mb-1">
+                            Surat Balasan <span class="text-gray-500">(Opsional)</span>
+                        </label>
+                        <input type="file" id="path_surat_balasan" name="path_surat_balasan" accept=".pdf,.jpg,.jpeg,.png" @change="previewFile($event, 'balasan')" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-l-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
                         @error('path_surat_balasan')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
+
+                        <!-- Preview Surat Balasan -->
+                        @if ($magang && $magang->path_surat_balasan)
+                            <div class="mt-3 border rounded-lg p-3 bg-blue-50">
+                                <p class="text-xs font-medium text-gray-700 mb-2">File Saat Ini:</p>
+                                @php
+                                    $ext = strtolower(pathinfo($magang->path_surat_balasan, PATHINFO_EXTENSION));
+                                    $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif']);
+                                @endphp
+                                @if ($isImage)
+                                    <img src="{{ asset('storage/' . $magang->path_surat_balasan) }}" alt="Surat Balasan" class="w-full h-32 object-contain rounded bg-white mb-2">
+                                @else
+                                    <div class="flex items-center p-3 bg-white rounded">
+                                        <svg class="w-8 h-8 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 18h12V6l-4-4H4v16zm8-14v4h4l-4-4z" />
+                                        </svg>
+                                        <span class="text-sm text-gray-700">{{ basename($magang->path_surat_balasan) }}</span>
+                                    </div>
+                                @endif
+                                <div class="flex gap-2 mt-2">
+                                    <a href="{{ asset('storage/' . $magang->path_surat_balasan) }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800">Lihat</a>
+                                    <a href="{{ asset('storage/' . $magang->path_surat_balasan) }}" download class="text-xs text-green-600 hover:text-green-800">Download</a>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2 italic">Upload file baru untuk mengganti</p>
+                            </div>
+                        @endif
+
+                        <!-- New File Preview -->
+                        <div x-show="previews.balasan.url" x-cloak class="mt-3 border rounded-lg p-3 bg-green-50">
+                            <div class="flex justify-between items-center mb-2">
+                                <p class="text-xs font-medium text-gray-700">Preview File Baru:</p>
+                                <button type="button" @click="clearPreview('balasan')" class="text-xs text-red-600 hover:text-red-800">Hapus</button>
+                            </div>
+                            <template x-if="previews.balasan.type === 'image'">
+                                <img :src="previews.balasan.url" class="w-full h-32 object-contain rounded bg-white">
+                            </template>
+                            <template x-if="previews.balasan.type === 'pdf'">
+                                <div class="flex items-center p-3 bg-white rounded">
+                                    <svg class="w-8 h-8 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M4 18h12V6l-4-4H4v16zm8-14v4h4l-4-4z" />
+                                    </svg>
+                                    <span class="text-sm text-gray-700" x-text="previews.balasan.name"></span>
+                                </div>
+                            </template>
+                        </div>
                     </div>
+
+                    <!-- Info Tambahan untuk Edit Mode -->
+                    @if ($magang)
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <h5 class="text-xs font-semibold text-gray-900 uppercase mb-3">Informasi Sistem</h5>
+                            <div class="space-y-2 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">ID Magang:</span>
+                                    <span class="font-medium text-gray-900">#{{ str_pad($magang->id, 5, '0', STR_PAD_LEFT) }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Dibuat:</span>
+                                    <span class="font-medium text-gray-900">{{ $magang->created_at->format('d M Y H:i') }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Update:</span>
+                                    <span class="font-medium text-gray-900">{{ $magang->updated_at->format('d M Y H:i') }}</span>
+                                </div>
+                                @if ($magang->workflow_status)
+                                    <div class="flex justify-between pt-2 border-t">
+                                        <span class="text-gray-600">Workflow:</span>
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            {{ ucfirst(str_replace('_', ' ', $magang->workflow_status)) }}
+                                        </span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
-
-            @error('path_surat_balasan')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
         </div>
-</div>
-</div>
 
-<!-- Status -->
-<div>
-    <x-admin.form-select name="status" label="Status Magang" required="true" placeholder="Pilih status magang">
-        <option value="menunggu" {{ old('status', $magang->status ?? '') === 'menunggu' ? 'selected' : '' }}>
-            Menunggu
-        </option>
-        <option value="diterima" {{ old('status', $magang->status ?? '') === 'diterima' ? 'selected' : '' }}>
-            Diterima
-        </option>
-        <option value="ditolak" {{ old('status', $magang->status ?? '') === 'ditolak' ? 'selected' : '' }}>
-            Ditolak
-        </option>
-        <option value="selesai" {{ old('status', $magang->status ?? '') === 'selesai' ? 'selected' : '' }}>
-            Selesai
-        </option>
-    </x-admin.form-select>
-</div>
-
-@if ($magang)
-    <!-- Status Information -->
-    <div class="bg-gray-50 rounded-lg p-4">
-        <h4 class="text-sm font-medium text-gray-900 mb-2">Informasi Data Magang</h4>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div>
-                <span class="text-gray-500">Dibuat:</span>
-                <span class="font-medium">{{ $magang->created_at->format('d M Y H:i') }}</span>
-            </div>
-            <div>
-                <span class="text-gray-500">Terakhir update:</span>
-                <span class="font-medium">{{ $magang->updated_at->format('d M Y H:i') }}</span>
-            </div>
-            @if ($magang->status === 'diterima')
-                <div class="md:col-span-2">
-                    <span class="text-gray-500">Durasi:</span>
-                    <span class="font-medium">
-                        {{ \Carbon\Carbon::parse($magang->tanggal_mulai)->diffInDays(\Carbon\Carbon::parse($magang->tanggal_selesai)) }} hari
-                    </span>
-                </div>
-            @endif
-        </div>
-    </div>
-@endif
-</div>
-
-<div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3">
-    <a href="{{ route('magang.index') }}" class="inline-flex justify-center items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
-        Batal
-    </a>
-    <button type="submit" class="inline-flex justify-center items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
-        {{ $magang ? 'Update Data Magang' : 'Simpan Data Magang' }}
-    </button>
-</div>
-</form>
-</div>
-
-<script>
-    function enhancedFilePreview() {
-        return {
-            fileUrl: null,
-            fileName: '',
-            fileType: '',
-            existingFile: false,
-            modalOpen: false,
-            modalContent: {
-                url: '',
-                type: '',
-                name: ''
-            },
-
-            handleFileSelect(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    this.fileName = file.name;
-                    this.fileUrl = URL.createObjectURL(file);
-
-                    if (file.type.startsWith('image/')) {
-                        this.fileType = 'image';
-                    } else if (file.type === 'application/pdf') {
-                        this.fileType = 'pdf';
-                    } else {
-                        this.fileType = 'other';
-                    }
-                }
-            },
-
-            clearFile() {
-                this.fileUrl = null;
-                this.fileName = '';
-                this.fileType = '';
-                // Reset the file input
-                const input = this.$el.querySelector('input[type="file"]');
-                if (input) input.value = '';
-            },
-
-            openModal() {
-                this.modalContent = {
-                    url: this.fileUrl,
-                    type: this.fileType,
-                    name: this.fileName
-                };
-                this.modalOpen = true;
-                document.body.style.overflow = 'hidden';
-            },
-
-            openExistingFile(url, extension) {
-                let fileType = 'other';
-                if (['jpg', 'jpeg', 'png', 'gif'].includes(extension.toLowerCase())) {
-                    fileType = 'image';
-                } else if (extension.toLowerCase() === 'pdf') {
-                    fileType = 'pdf';
-                }
-
-                this.modalContent = {
-                    url: url,
-                    type: fileType,
-                    name: 'File saat ini.' + extension
-                };
-                this.modalOpen = true;
-                document.body.style.overflow = 'hidden';
-            },
-
-            closeModal() {
-                this.modalOpen = false;
-                document.body.style.overflow = 'auto';
-            }
-        }
-    }
-</script>
-
-<!-- Modal Preview Global -->
-<div x-data="globalModal()" @open-modal.window="openModal($event.detail)" @keydown.escape.window="closeModal()" x-show="isOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
-
-    <!-- Background Overlay -->
-    <div x-show="isOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeModal()">
-    </div>
-
-    <!-- Modal Content -->
-    <div class="flex items-center justify-center min-h-screen px-4 py-6">
-        <div x-show="isOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="bg-white rounded-lg shadow-xl transform transition-all w-full max-w-4xl max-h-[90vh] overflow-hidden">
-
-            <!-- Modal Header -->
-            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                <h3 class="text-lg font-medium text-gray-900">
-                    Preview File: <span x-text="content.name" class="text-sm font-normal text-gray-600"></span>
-                </h3>
-                <button type="button" @click="closeModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500 transition ease-in-out duration-150">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <!-- Footer Buttons -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
+            <p class="text-xs text-gray-500">
+                <span class="text-red-600 font-medium">*</span> menandakan field wajib diisi
+            </p>
+            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                <a href="{{ route('magang.index') }}" class="inline-flex justify-center items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
+                    Batal
+                </a>
+                <button type="submit" class="inline-flex justify-center items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {{ $magang ? 'Update Data Magang' : 'Simpan Data Magang' }}
                 </button>
             </div>
-
-            <!-- Modal Body -->
-            <div class="max-h-[70vh] overflow-auto bg-gray-50">
-                <template x-if="content.type === 'image'">
-                    <div class="p-4 flex items-center justify-center">
-                        <img :src="content.url" :alt="content.name" class="max-w-full max-h-full object-contain rounded-lg shadow-lg">
-                    </div>
-                </template>
-
-                <template x-if="content.type === 'pdf'">
-                    <div class="h-[70vh] w-full">
-                        <iframe :src="content.url" class="w-full h-full border-0" frameborder="0">
-                        </iframe>
-                    </div>
-                </template>
-
-                <template x-if="content.type === 'other'">
-                    <div class="p-8 text-center">
-                        <svg class="mx-auto w-16 h-16 text-gray-400 mb-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M4 18h12V6l-4-4H4v16zm8-14v4h4l-4-4z" />
-                        </svg>
-                        <p class="text-gray-600 mb-4">File tidak dapat di-preview di browser</p>
-                        <a :href="content.url" download class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Download File
-                        </a>
-                    </div>
-                </template>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="px-6 py-4 border-t border-gray-200 flex justify-between">
-                <template x-if="content.type !== 'other'">
-                    <a :href="content.url" target="_blank" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-sm text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                        Buka di Tab Baru
-                    </a>
-                </template>
-                <div class="ml-auto">
-                    <button type="button" @click="closeModal()" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Tutup
-                    </button>
-                </div>
-            </div>
         </div>
-    </div>
+    </form>
 </div>
 
 <script>
-    function enhancedFilePreview() {
+    function documentPreview() {
         return {
-            fileUrl: null,
-            fileName: '',
-            fileType: '',
-            existingFile: false,
+            previews: {
+                permohonan: {
+                    url: null,
+                    type: null,
+                    name: null
+                },
+                balasan: {
+                    url: null,
+                    type: null,
+                    name: null
+                }
+            },
 
-            handleFileSelect(event) {
+            previewFile(event, type) {
                 const file = event.target.files[0];
-                if (file) {
-                    this.fileName = file.name;
-                    this.fileUrl = URL.createObjectURL(file);
+                if (!file) return;
 
-                    if (file.type.startsWith('image/')) {
-                        this.fileType = 'image';
-                    } else if (file.type === 'application/pdf') {
-                        this.fileType = 'pdf';
-                    } else {
-                        this.fileType = 'other';
-                    }
+                this.previews[type].name = file.name;
+                this.previews[type].url = URL.createObjectURL(file);
+
+                if (file.type.startsWith('image/')) {
+                    this.previews[type].type = 'image';
+                } else if (file.type === 'application/pdf') {
+                    this.previews[type].type = 'pdf';
+                } else {
+                    this.previews[type].type = 'other';
                 }
             },
 
-            clearFile() {
-                this.fileUrl = null;
-                this.fileName = '';
-                this.fileType = '';
-                // Reset the file input
-                const input = this.$el.querySelector('input[type="file"]');
+            clearPreview(type) {
+                this.previews[type] = {
+                    url: null,
+                    type: null,
+                    name: null
+                };
+                const input = document.getElementById('path_surat_' + type);
                 if (input) input.value = '';
-            },
-
-            openModal() {
-                window.dispatchEvent(new CustomEvent('open-modal', {
-                    detail: {
-                        url: this.fileUrl,
-                        type: this.fileType,
-                        name: this.fileName
-                    }
-                }));
-            },
-
-            openExistingFile(url, extension) {
-                let fileType = 'other';
-                if (['jpg', 'jpeg', 'png', 'gif'].includes(extension.toLowerCase())) {
-                    fileType = 'image';
-                } else if (extension.toLowerCase() === 'pdf') {
-                    fileType = 'pdf';
-                }
-
-                window.dispatchEvent(new CustomEvent('open-modal', {
-                    detail: {
-                        url: url,
-                        type: fileType,
-                        name: 'File saat ini.' + extension
-                    }
-                }));
-            }
-        }
-    }
-
-    function globalModal() {
-        return {
-            isOpen: false,
-            content: {
-                url: '',
-                type: '',
-                name: ''
-            },
-
-            openModal(details) {
-                this.content = details;
-                this.isOpen = true;
-                document.body.style.overflow = 'hidden';
-            },
-
-            closeModal() {
-                this.isOpen = false;
-                document.body.style.overflow = 'auto';
             }
         }
     }
