@@ -143,8 +143,11 @@ class PenilaianAkhirController extends Controller
             'path_surat_nilai' => $suratNilaiPath,
         ]);
 
-        // Update workflow status to evaluated
-        $dataMagang->update(['workflow_status' => 'evaluated']);
+        // Update status to 'selesai' and workflow_status to 'evaluated'
+        $dataMagang->update([
+            'status' => 'selesai',
+            'workflow_status' => 'evaluated'
+        ]);
 
         return redirect()->route('penilaian.index')->with('success', 'Penilaian akhir berhasil dibuat');
     }
@@ -249,6 +252,10 @@ class PenilaianAkhirController extends Controller
         ];
 
         $penilaian->update($updateData);
+
+        // Ensure status is still 'selesai'
+        $penilaian->dataMagang->update(['status' => 'selesai']);
+
         return redirect()->route('penilaian.index')->with('success', 'Penilaian akhir berhasil diupdate');
     }
 
