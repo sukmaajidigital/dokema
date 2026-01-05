@@ -175,8 +175,8 @@
                                                 </div>
                                             </div>
                                             <div class="ml-3">
-                                                <p class="text-sm font-semibold text-gray-900">{{ $dataMagang->pembimbing->user->name }}</p>
-                                                <p class="text-xs text-gray-600">{{ $dataMagang->pembimbing->user->email }}</p>
+                                                <p class="text-sm font-semibold text-gray-900">{{ $dataMagang->pembimbing->name }}</p>
+                                                <p class="text-xs text-gray-600">{{ $dataMagang->pembimbing->email }}</p>
                                             </div>
                                         </div>
                                     </div>

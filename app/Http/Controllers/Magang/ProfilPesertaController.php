@@ -194,7 +194,7 @@ class ProfilPesertaController extends Controller
         // Jika user memiliki profil peserta, ambil data magang terkait
         $dataMagang = null;
         if ($profil) {
-            $dataMagang = $profil->dataMagang()->with('pembimbing.user')->first();
+            $dataMagang = $profil->dataMagang()->with('pembimbing')->first();
         }
 
         return view('magang.profil.my-profile', compact('user', 'profil', 'dataMagang'));
