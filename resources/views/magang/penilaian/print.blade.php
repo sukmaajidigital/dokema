@@ -236,11 +236,11 @@
             <div class="info-separator">:</div>
             <div class="info-value">PT Telkom Akses</div>
         </div>
-        <div class="info-row">
+        {{-- <div class="info-row">
             <div class="info-label">Judul Praktek Kerja Lapangan</div>
             <div class="info-separator">:</div>
             <div class="info-value">{{ $penilaian->dataMagang->judul_kegiatan ?? 'Sistem Manajemen Magang' }}</div>
-        </div>
+        </div> --}}
         <div class="info-row">
             <div class="info-label">Tanggal Kerangka Acuan</div>
             <div class="info-separator">:</div>
